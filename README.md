@@ -133,9 +133,9 @@ fi
 2. 종료 상태가 `0`이면 `then` 블록 실행  
 3. 종료 상태가 `0`이 아니면 `then` 블록 건너뜀
 
-# Bash Control Structures
 
-## TEST COMMAND
+
+# TEST COMMAND
 
 ### 설명
 - `test` 명령어나 `[ expression ]`을 사용하여 조건을 평가하고, 참(true) 또는 거짓(false)을 반환한다.
@@ -146,6 +146,8 @@ fi
 test expression
 [ expression ]
 ```
+- `test` 또는 `[]`를 사용하여 특정 조건을 평가할 수 있다.
+- 조건이 참이면 `0`(성공), 거짓이면 `1`(실패) 상태를 반환한다.
 
 ### Example:
 ```sh
@@ -155,6 +157,7 @@ then
 fi
 ```
 - `$1` 파일이 쓰기 가능하면 `"file $1 is write-able"`을 출력한다.
+- `-w` 옵션은 파일이 쓰기 가능한지 확인하는 조건이다.
 
 ---
 
@@ -171,6 +174,7 @@ if [ condition ]; then
 fi
 ```
 - `[ condition ]`은 조건을 검사하며, 조건이 참이면 `then` 블록 내 명령어가 실행된다.
+- `condition`은 파일 상태, 변수 값 비교, 문자열 비교 등에 사용할 수 있다.
 
 ### Example:
 ```sh
@@ -247,6 +251,9 @@ fi
 - `$1`이 10보다 크면 "Number is greater than 10" 출력.
 - `$1`이 10과 같으면 "Number is exactly 10" 출력.
 - `$1`이 10보다 작으면 "Number is less than 10" 출력.
+- `-gt`(greater than), `-eq`(equal to), `-lt`(less than) 연산자를 사용하여 숫자 비교를 수행한다.
+
+
 
 
 
