@@ -490,3 +490,35 @@ Your rate is $7.00
 
 ---
 
+# BASH PROGRAMMING: SO FAR
+
+### 데이터 구조
+- 변수 (Variables)
+- 숫자 변수 (Numeric variables)
+- 배열 (Arrays)
+
+### 사용자 입력
+- `read` 명령어를 사용하여 사용자 입력을 받을 수 있음.
+
+### 제어 구조 (Control structures)
+- `if-then-else` 문
+- `case` 문
+
+---
+
+# BASH PROGRAMMING: STILL TO COME
+
+### 추가 학습할 제어 구조
+- 반복문 (Repetition)
+  - `do-while`
+  - `repeat-until`
+  - `for`
+  - `select`
+
+### 기타 학습 내용
+- 함수 (Functions)
+- 신호 트래핑 (Trapping signals)
+
+
+
+---
