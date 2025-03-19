@@ -425,6 +425,68 @@ file1
 Invalid choice!
 ```
 
+---
 
+# EXAMPLE 2: THE CASE STATEMENT
 
+### 설명
+- `case` 문을 사용하여 입력된 연령대에 따라 요금을 결정하는 스크립트.
+- 연령대를 구분하여 `ChildRate`, `AdultRate`, `SeniorRate`에 따라 요금을 출력.
+
+```sh
+#!/bin/bash
+ChildRate=3
+AdultRate=10
+SeniorRate=7
+
+read -p "Enter your age: " age
+
+case $age in
+    [1-9]|[1][0-2])   # 어린이 요금 (1~12세)
+        echo "Your rate is $""$ChildRate.00" ;;
+    [1][3-9]|[2-5][0-9]) # 성인 요금 (13~59세)
+        echo "Your rate is $""$AdultRate.00" ;;
+    [6-9][0-9])       # 노인 요금 (60세 이상)
+        echo "Your rate is $""$SeniorRate.00" ;;
+esac
+```
+
+### 동작 방식
+1. 사용자가 나이를 입력.
+2. `case` 문을 통해 나이 범위를 패턴과 비교:
+   - `[1-9]|[1][0-2]` → 1~12세: 어린이 요금 적용 (`$ChildRate`)
+   - `[1][3-9]|[2-5][0-9]` → 13~59세: 성인 요금 적용 (`$AdultRate`)
+   - `[6-9][0-9]` → 60세 이상: 노인 요금 적용 (`$SeniorRate`)
+3. 해당하는 요금을 출력.
+
+### 실행 방법
+1. 스크립트 파일 생성
+   ```sh
+   nano case_rate.sh
+   ```
+2. 위 코드 입력 후 저장 (Ctrl + X → Y → Enter)
+3. 실행 권한 부여
+   ```sh
+   chmod +x case_rate.sh
+   ```
+4. 실행
+   ```sh
+   ./case_rate.sh
+   ```
+
+### 예제 실행 결과
+#### 입력값: `10`
+```sh
+Your rate is $3.00
+```
+#### 입력값: `25`
+```sh
+Your rate is $10.00
+```
+#### 입력값: `65`
+```sh
+Your rate is $7.00
+```
+
+---
 
