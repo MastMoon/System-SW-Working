@@ -71,3 +71,17 @@ read -p "enter your name: " first last
 echo "First name: $first"
 echo "Last name: $last"
 
+
+# SPECIAL SHELL VARIABLES
+
+| Parameter | Meaning |
+|-----------|------------------------------------------------|
+| `$0`      | Name of the current shell script              |
+| `$1-$9`   | Positional parameters 1 through 9            |
+| `$#`      | The number of positional parameters          |
+| `$*`      | All positional parameters (as a single string) |
+| `$@`      | All positional parameters (as separate strings) |
+| `$?`      | Return status of the most recently executed command |
+| `$$`      | Process ID of the current process            |
+
+
