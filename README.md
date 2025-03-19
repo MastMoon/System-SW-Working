@@ -6,6 +6,7 @@
 
 ## Bash 스크립트에서 사용
 #! /bin/bash
+
 echo "Hello, World!"
 
 ## 실행 방법
