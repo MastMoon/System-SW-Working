@@ -46,3 +46,28 @@ chmod +x script.sh
 ## Traps (트랩)
 - `trap` 명령어를 사용하면 특정 신호(예: Ctrl+C)가 입력될 때 원하는 동작을 지정할 수 있다.
 - 이를 통해 스크립트가 강제 종료되는 것을 방지하거나, 종료 전에 특정 작업을 수행할 수 있다.
+
+
+# USER INPUT
+
+## Shell은 사용자 입력을 받을 수 있도록 `read` 명령어를 제공한다.
+
+### Syntax:
+- `read varname [more vars]`
+- `read -p "prompt" varname [more vars]`
+  - `-p` 옵션을 사용하면 입력을 요청하는 메시지를 표시할 수 있다.
+  - 사용자가 입력한 단어들이 변수(`varname` 및 `more vars`)에 할당된다.
+  - 마지막 변수는 남은 모든 입력을 받는다.
+
+## USER INPUT EXAMPLE
+
+### 예제 스크립트
+- 쉘 스크립트에서 사용자에게 이름을 입력받아 출력하는 예제
+
+### 코드:
+```sh
+#! /bin/sh
+read -p "enter your name: " first last
+echo "First name: $first"
+echo "Last name: $last"
+
