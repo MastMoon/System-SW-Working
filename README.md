@@ -182,17 +182,6 @@ fi
 
 ---
 
-## COMPOUND LOGICAL EXPRESSIONS
-
-### 연산자 목록
-| 연산자 | 의미 |
-|--------|------|
-| `!` | NOT (부정) |
-| `&&` | AND (논리곱) |
-| `\|\|` | OR (논리합) |
-
----
-
 ## EXAMPLE: USING THE `!` OPERATOR
 
 ```sh
@@ -204,6 +193,9 @@ else
     echo "You need 20+ years to retire"
 fi
 ```
+- `!` (논리 부정 연산자)를 사용하여 조건을 반대로 평가.
+- `Years` 값이 20 미만이면 `"You need 20+ years to retire"` 출력.
+- 20 이상이면 `"You can retire now."` 출력.
 
 ---
 
@@ -222,6 +214,8 @@ else
     echo "shift 3 get a bonus"
 fi
 ```
+- `&&` (논리곱) 연산자를 사용하여 두 조건이 모두 참일 때 실행.
+- `Status`가 `"H"`이고 `Shift`가 `3`이면 보너스를 지급.
 
 ---
 
