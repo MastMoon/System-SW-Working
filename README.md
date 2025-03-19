@@ -597,6 +597,122 @@ done
 - `sleep 3600`을 사용하여 매시간 파일을 이동함.
 - `while true`는 무한 루프를 수행함.
 
+---
+
+# THE UNTIL LOOP
+
+### 설명
+- `until` 루프는 `expression`이 거짓(`false`)인 동안 `command-list`를 실행한다.
+
+### Syntax:
+```sh
+until [ expression ]
+do
+    command-list
+done
+```
+- `[ expression ]`이 거짓일 때 `command-list` 실행.
+- 표현식이 참이 되면 루프 종료.
+
+---
+
+## EXAMPLE: USING THE UNTIL LOOP
+
+### 예제 1: 카운터 감소
+```sh
+#!/bin/bash
+COUNTER=20
+until [ $COUNTER -lt 10 ]
+do
+    echo $COUNTER
+    let COUNTER-=1
+done
+```
+- `COUNTER` 값이 10 미만이 될 때까지 감소하면서 출력.
+- `let COUNTER-=1` 을 통해 카운터 감소.
+
+---
+
+### 예제 2: 사용자 입력을 통한 반복 제어
+```sh
+#!/bin/bash
+Stop="N"
+until [ $Stop = "Y" ]; do
+    ps -A
+    read -p "Want to stop? (Y/N)" reply
+    Stop=`echo $reply | tr [:lower:] [:upper:]`
+done
+echo "Done"
+```
+- 프로세스 목록(`ps -A`)을 출력한 후, 실행을 중지할지 여부를 물어봄.
+- 입력값을 대문자로 변환하여 비교 (`tr [:lower:] [:upper:]`).
+- `Y`가 입력되면 루프 종료, 그렇지 않으면 계속 실행.
+
+---
+
+# THE FOR LOOP
+
+### 설명
+- `for` 루프는 `argument-list`에 포함된 각 요소에 대해 `command-list`를 실행한다.
+
+### Syntax:
+```sh
+for variable in argument-list
+do
+    commands
+done
+```
+- `argument-list`의 각 요소가 `variable`에 저장되며, 해당 값을 이용해 `commands` 실행.
+
+---
+
+## EXAMPLE 1: THE FOR LOOP
+
+```sh
+#!/bin/bash
+for i in 7 9 2 3 4 5
+do
+    echo $i
+done
+```
+- `7 9 2 3 4 5` 값들을 `i`에 할당하며 반복 실행.
+- 각 값이 차례로 출력됨.
+
+---
+
+## EXAMPLE 2: USING THE FOR LOOP
+
+```sh
+#!/bin/bash
+# Compute the average weekly temperature
+for num in 1 2 3 4 5 6 7
+do
+    read -p "Enter temp for day $num: " Temp
+    let TempTotal=$TempTotal+$Temp
+done
+let AvgTemp=$TempTotal/7
+echo "Average temperature: $AvgTemp"
+```
+- 사용자에게 7일간의 온도를 입력받아 합산.
+- 7로 나누어 평균 온도를 계산 후 출력.
+
+---
+
+# LOOPING OVER ARGUMENTS
+
+### 설명
+- 가장 간단한 형태의 `for` 루프는 커맨드 라인에서 전달된 모든 인수를 반복 실행한다.
+
+```sh
+#!/bin/bash
+for parm
+do
+    echo $parm
+done
+```
+- 실행 시 전달된 인수들을 하나씩 출력함.
+- 예를 들어, `./script.sh arg1 arg2 arg3`를 실행하면 `arg1`, `arg2`, `arg3`가 차례로 출력됨.
+
 
 
 ---
