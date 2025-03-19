@@ -336,5 +336,101 @@ fi
 - `Net` 값에 따라 손익 상태를 출력.
 - `"0"`이면 손익분기, 양수이면 이익, 음수이면 손실을 나타냄.
 
+---
+
+# THE CASE STATEMENT
+
+### 설명
+- `case` 문은 여러 선택지를 기반으로 결정을 내릴 때 사용된다.
+- `if-elif-else` 문보다 간결하고 가독성이 좋다.
+
+### Syntax:
+```sh
+case word in
+    pattern1) command-list1 ;;
+    pattern2) command-list2 ;;
+    patternN) command-listN ;;
+esac
+```
+- `word` 값이 패턴(`pattern1`, `pattern2` 등)과 일치하면 해당 명령 목록(`command-list`)을 실행한다.
+- `esac` 키워드를 사용하여 `case` 문을 종료한다.
+
+---
+
+## CASE PATTERN
+- `word`와 `pattern`을 비교하여 일치하는 패턴이 있는 경우 해당 명령을 실행한다.
+- 패턴에는 다음과 같은 특수 문자를 사용할 수 있다:
+  - `*` : 모든 문자열과 일치
+  - `?` : 단일 문자와 일치
+  - `[ … ]` : 대괄호 안의 문자 중 하나와 일치
+  - `[:class:]` : 특정 문자 클래스와 일치 (예: `[:digit:]` → 숫자와 일치)
+- 여러 개의 패턴을 `|` 기호를 사용하여 한 줄에 나열할 수 있다.
+
+---
+
+## EXAMPLE 1: THE CASE STATEMENT
+```sh
+#!/bin/bash
+echo "Enter Y to see all files including hidden files"
+echo "Enter N to see all non-hidden files"
+echo "Enter Q to quit"
+read -p "Enter your choice: " reply
+
+case $reply in
+    Y|YES) echo "Displaying all (really…) files"
+           ls -a ;;
+    N|NO)  echo "Displaying all non-hidden files..."
+           ls ;;
+    Q)     exit 0 ;;
+    *)     echo "Invalid choice!"; exit 1 ;;
+esac
+```
+
+### 동작 방식
+1. 사용자에게 입력값을 받는다.
+2. 입력값이 `Y` 또는 `YES`이면 숨김 파일을 포함한 모든 파일을 출력한다 (`ls -a`).
+3. 입력값이 `N` 또는 `NO`이면 숨김 파일을 제외한 파일만 출력한다 (`ls`).
+4. 입력값이 `Q`이면 스크립트가 종료된다.
+5. 위의 조건과 일치하지 않으면 `"Invalid choice!"` 메시지를 출력하고 종료한다.
+
+### 실행 방법
+1. 스크립트 파일 생성
+   ```sh
+   nano case_script.sh
+   ```
+2. 위 코드 입력 후 저장 (Ctrl + X → Y → Enter)
+3. 실행 권한 부여
+   ```sh
+   chmod +x case_script.sh
+   ```
+4. 실행
+   ```sh
+   ./case_script.sh
+   ```
+
+### 예제 실행 결과
+#### 입력값이 `Y`
+```sh
+Displaying all (really…) files
+.  ..  file1  .hiddenfile
+```
+
+#### 입력값이 `N`
+```sh
+Displaying all non-hidden files...
+file1
+```
+
+#### 입력값이 `Q`
+```sh
+(스크립트 종료)
+```
+
+#### 잘못된 입력값 (`X` 등)
+```sh
+Invalid choice!
+```
+
+
 
 
