@@ -113,20 +113,56 @@ fi
 
 # TEST COMMAND
 
+### 설명
+- `test` 명령어나 `[ expression ]`을 사용하여 조건을 평가하고, 참(true) 또는 거짓(false)을 반환한다.
+- `[ expression ]` 형식은 `test expression`과 동일하게 동작하며, 조건을 판별하는 데 사용된다.
+- 조건이 참이면 `0`(성공), 거짓이면 `1`(실패) 상태를 반환한다.
+
 ### Syntax:
 ```sh
 test expression
 [ expression ]
 ```
-- `test` 또는 `[]`을 사용하여 특정 조건을 평가.
+- `test` 또는 `[]`을 사용하여 특정 조건을 평가할 수 있다.
 
 ### Example:
 ```sh
 if test -w "$1"
 then
     echo "file $1 is write-able"
+else
+    echo "file $1 is not write-able or does not exist"
 fi
 ```
+- `$1` 파일이 쓰기 가능하면 `"file $1 is write-able"`을 출력한다.
+- 파일이 없거나 쓰기 불가능하면 `"file $1 is not write-able or does not exist"`를 출력한다.
+
+### 실행 방법
+1. 스크립트 파일 생성
+   ```sh
+   nano test_script.sh
+   ```
+2. 위 코드 입력 후 저장 (Ctrl + X → Y → Enter)
+3. 실행 권한 부여
+   ```sh
+   chmod +x test_script.sh
+   ```
+4. 실행
+   ```sh
+   ./test_script.sh filename.txt
+   ```
+   (여기서 `filename.txt`는 확인할 파일 이름)
+
+### 결과 예시
+- `filename.txt` 파일이 쓰기 가능하면:
+  ```sh
+  file filename.txt is write-able
+  ```
+- 파일이 없거나 쓰기 불가능하면:
+  ```sh
+  file filename.txt is not write-able or does not exist
+  ```
+
 
 ---
 
