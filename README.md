@@ -253,6 +253,8 @@ fi
 - `$1`이 10보다 작으면 "Number is less than 10" 출력.
 - `-gt`(greater than), `-eq`(equal to), `-lt`(less than) 연산자를 사용하여 숫자 비교를 수행한다.
 
+---
+
 ## RELATIONAL OPERATORS
 
 ### 설명
