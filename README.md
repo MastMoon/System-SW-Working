@@ -17,4 +17,4 @@ echo "Hello, World!"
 chmod +x script.sh  # 실행 권한 부여
 ./script.sh         # 실행
 
-# '! /bin/bash'를 사용하면 자동으로 Bash 환경에서 실행됨
+#! /bin/bash'를 사용하면 자동으로 Bash 환경에서 실행됨
