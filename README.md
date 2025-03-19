@@ -519,6 +519,84 @@ Your rate is $7.00
 - 함수 (Functions)
 - 신호 트래핑 (Trapping signals)
 
+---
+
+# THE WHILE LOOP
+
+### 목적
+- `while` 루프는 `expression`이 참(`true`)인 동안 `command-list`를 반복 실행한다.
+
+### Syntax:
+```sh
+while [ expression ]
+do
+    command-list
+done
+```
+- `[ expression ]`이 참일 때 `command-list` 실행.
+- 표현식이 거짓이 되면 루프 종료.
+
+---
+
+## EXAMPLE: USING THE WHILE LOOP
+
+### 예제 1: 기본적인 카운터 증가
+```sh
+#!/bin/bash
+COUNTER=0
+while [ $COUNTER -lt 10 ]
+do
+    echo "The counter is $COUNTER"
+    let COUNTER=$COUNTER+1
+done
+```
+- `COUNTER` 값이 10 미만인 동안 증가하면서 출력.
+- `let COUNTER=$COUNTER+1` 을 통해 카운터 증가.
+
+---
+
+### 예제 2: 사용자 입력을 통한 반복 제어
+```sh
+#!/bin/bash
+Cont="Y"
+while [ $Cont = "Y" ]; do
+    ps -A
+    read -p "Want to continue? (Y/N)" reply
+    Cont=`echo $reply | tr [:lower:] [:upper:]`
+done
+echo "Done"
+```
+- 프로세스 목록(`ps -A`)을 출력한 후, 계속 실행할지 여부를 물어봄.
+- 입력값을 대문자로 변환하여 비교 (`tr [:lower:] [:upper:]`).
+- `Y`가 입력되면 계속 실행, 그렇지 않으면 종료.
+
+---
+
+### 예제 3: 특정 디렉토리에 파일을 시간별로 이동
+```sh
+#!/bin/bash
+# 홈 디렉토리에서 웹 서버 디렉토리로 파일을 복사하는 스크립트
+# 새로운 디렉토리를 매 시간 생성
+PICSDIR=/home/carol/pics
+WEBDIR=/var/www/carol/webcam
+while true; do
+    DATE=`date +%Y%m%d`
+    HOUR=`date +%H`
+    mkdir $WEBDIR/"$DATE"
+    while [ $HOUR -ne "00" ]; do
+        DESTDIR=$WEBDIR/"$DATE"/"$HOUR"
+        mkdir "$DESTDIR"
+        mv $PICSDIR/*.jpg "$DESTDIR"/
+        sleep 3600
+        HOUR=`date +%H`
+    done
+done
+```
+- `PICSDIR`에서 `WEBDIR`로 `.jpg` 파일을 이동하는 스크립트.
+- 매시간 새로운 디렉토리를 생성하고 이미지를 이동시킴.
+- `sleep 3600`을 사용하여 매시간 파일을 이동함.
+- `while true`는 무한 루프를 수행함.
+
 
 
 ---
