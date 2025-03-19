@@ -223,3 +223,118 @@ else
 fi
 ```
 
+---
+
+## EXAMPLE: USING THE `||` OPERATOR
+
+```sh
+#!/bin/bash
+read -p "Enter calls handled: " CHandle
+read -p "Enter calls closed: " CClose
+if [[ "$CHandle" -gt 150 || "$CClose" -gt 50 ]]
+then
+    echo "You are entitled to a bonus"
+else
+    echo "You get a bonus if the calls"
+    echo "handled exceeds 150 or"
+    echo "calls closed exceeds 50"
+fi
+```
+- `||` (논리합) 연산자를 사용하여 두 조건 중 하나라도 참이면 실행.
+- `CHandle`이 150보다 크거나 `CClose`가 50보다 크면 보너스를 지급.
+
+---
+
+## FILE TESTING
+
+### 파일 상태를 확인하는 연산자 목록
+| 연산자 | 의미 |
+|--------|------------------------------|
+| `-d file` | 파일이 디렉토리이면 참 |
+| `-f file` | 파일이 일반 파일이면 참 |
+| `-r file` | 파일이 읽기 가능하면 참 |
+| `-w file` | 파일이 쓰기 가능하면 참 |
+| `-x file` | 파일이 실행 가능하면 참 |
+| `-s file` | 파일 크기가 0보다 크면 참 |
+
+---
+
+## EXAMPLE: FILE TESTING
+
+```sh
+#!/bin/bash
+echo "Enter a filename: "
+read filename
+if [ ! -r "$filename" ]
+then
+    echo "File is not readable"
+    exit 1
+fi
+```
+- 입력한 파일이 읽기 불가능하면 `"File is not readable"` 출력 후 종료.
+
+```sh
+#!/bin/bash
+if [ $# -lt 1 ]; then
+    echo "Usage: filetest filename"
+    exit 1
+fi
+if [[ ! -f "$1" || ! -r "$1" || ! -w "$1" ]]
+then
+    echo "File $1 is not accessible"
+    exit 1
+fi
+```
+- 실행 시 인수를 제공하지 않으면 사용법을 출력하고 종료.
+- 파일이 일반 파일이 아니거나 읽기/쓰기 불가능하면 `"File $1 is not accessible"` 출력 후 종료.
+
+---
+
+## EXAMPLE: IF… STATEMENT
+
+### 세 가지 방법으로 동일한 결과를 얻을 수 있음
+```sh
+# DOUBLE SQUARE BRACKETS
+read -p "Do you want to continue? " reply
+if [[ $reply = "y" ]]; then
+    echo "You entered $reply"
+fi
+
+# SINGLE SQUARE BRACKETS
+read -p "Do you want to continue? " reply
+if [ $reply = "y" ]; then
+    echo "You entered $reply"
+fi
+
+# "TEST" COMMAND
+read -p "Do you want to continue? " reply
+if test $reply = "y"; then
+    echo "You entered $reply"
+fi
+```
+- `[[ ... ]]`, `[ ... ]`, `test` 명령어를 사용하여 같은 결과를 얻을 수 있음.
+- 사용자가 `"y"`를 입력하면 `"You entered y"` 출력.
+
+---
+
+## EXAMPLE: IF..ELIF... STATEMENT
+
+```sh
+#!/bin/bash
+read -p "Enter Income Amount: " Income
+read -p "Enter Expenses Amount: " Expense
+let Net=$Income-$Expense
+if [ "$Net" -eq "0" ]; then
+    echo "Income and Expenses are equal - breakeven."
+elif [ "$Net" -gt "0" ]; then
+    echo "Profit of: $Net"
+else
+    echo "Loss of: $Net"
+fi
+```
+- `Income`과 `Expense`를 입력받아 순이익(`Net`)을 계산.
+- `Net` 값에 따라 손익 상태를 출력.
+- `"0"`이면 손익분기, 양수이면 이익, 음수이면 손실을 나타냄.
+
+
+
