@@ -2,9 +2,11 @@
 
 # Shebang (쉘 인터프리터 지정)
 
-#! /bin/bash    # Bash 쉘 사용
+#! /bin/bash    
+- Bash 쉘 사용
 
-#! /bin/sh      # 기본 Bourne Shell 사용 (보통 /bin/bash와 동일)
+#! /bin/sh      
+- 기본 Bourne Shell 사용 (보통 /bin/bash와 동일)
 
 # Bash 스크립트에서 사용
 #! /bin/bash
