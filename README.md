@@ -131,7 +131,124 @@ fi
 ## 동작 방식
 1. `command` 실행 후 종료 상태 확인  
 2. 종료 상태가 `0`이면 `then` 블록 실행  
-3. 종료 상태가 `0`이 아니면 `then` 블록 건너뜀  
+3. 종료 상태가 `0`이 아니면 `then` 블록 건너뜀
+
+# Bash Control Structures
+
+## TEST COMMAND
+
+### 설명
+- `test` 명령어나 `[ expression ]`을 사용하여 조건을 평가하고, 참(true) 또는 거짓(false)을 반환한다.
+- `[ expression ]` 형식은 `test expression`과 동일하게 동작하며, 조건을 판별하는 데 사용된다.
+
+### Syntax:
+```sh
+test expression
+[ expression ]
+```
+
+### Example:
+```sh
+if test -w "$1"
+then
+    echo "file $1 is write-able"
+fi
+```
+- `$1` 파일이 쓰기 가능하면 `"file $1 is write-able"`을 출력한다.
+
+---
+
+## THE SIMPLE IF STATEMENT
+
+### 설명
+- `if` 문은 조건을 검사하고, 조건이 참(true)일 경우 특정 명령을 실행한다.
+- 조건이 거짓(false)이면 `then` 블록 내의 명령어가 실행되지 않는다.
+
+### 기본 구조
+```sh
+if [ condition ]; then
+    statements
+fi
+```
+- `[ condition ]`은 조건을 검사하며, 조건이 참이면 `then` 블록 내 명령어가 실행된다.
+
+### Example:
+```sh
+if [ -f "$1" ]; then
+    echo "File $1 exists."
+fi
+```
+- `$1` 파일이 존재하면 `"File $1 exists."` 출력한다.
+- `-f` 옵션은 지정된 파일이 존재하는지 확인한다.
+
+---
+
+## THE IF-THEN-ELSE STATEMENT
+
+### 설명
+- `if` 문을 사용하여 조건이 참일 경우 `statements-1`을 실행하고, 조건이 거짓일 경우 `else` 블록의 `statements-2`를 실행한다.
+- 즉, 특정 조건에 따라 두 개의 실행 경로 중 하나를 선택할 수 있다.
+
+### 기본 구조
+```sh
+if [ condition ]; then
+    statements-1
+else
+    statements-2
+fi
+```
+- `[ condition ]`이 참이면 `statements-1`이 실행된다.
+- `[ condition ]`이 거짓이면 `else` 블록의 `statements-2`가 실행된다.
+
+### Example:
+```sh
+if [ -d "$1" ]; then
+    echo "$1 is a directory."
+else
+    echo "$1 is not a directory."
+fi
+```
+- `$1`이 디렉토리이면 `"$1 is a directory."` 출력.
+- `$1`이 디렉토리가 아니면 `"$1 is not a directory."` 출력.
+- `-d` 옵션은 지정된 파일이 디렉토리인지 확인한다.
+
+---
+
+## THE IF…STATEMENT
+
+### 설명
+- `elif`는 "else if"를 의미하며, `if` 문에서 추가적인 조건을 검사할 때 사용된다.
+- `elif`는 단독으로 사용할 수 없으며 반드시 `if` 문과 함께 사용해야 한다.
+
+### 기본 구조
+```sh
+if [ condition ]; then
+    statements
+elif [ condition ]; then
+    statement
+else
+    statements
+fi
+```
+- `[ condition ]`이 참이면 `then` 블록의 명령어가 실행된다.
+- 첫 번째 조건이 거짓이고 `elif`의 조건이 참이면 해당 블록이 실행된다.
+- 모든 조건이 거짓이면 `else` 블록의 명령어가 실행된다.
+
+### Example:
+```sh
+if [ $1 -gt 10 ]; then
+    echo "Number is greater than 10"
+elif [ $1 -eq 10 ]; then
+    echo "Number is exactly 10"
+else
+    echo "Number is less than 10"
+fi
+```
+- `$1`이 10보다 크면 "Number is greater than 10" 출력.
+- `$1`이 10과 같으면 "Number is exactly 10" 출력.
+- `$1`이 10보다 작으면 "Number is less than 10" 출력.
+
+
 
 
 
