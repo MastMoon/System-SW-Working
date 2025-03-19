@@ -253,6 +253,77 @@ fi
 - `$1`이 10보다 작으면 "Number is less than 10" 출력.
 - `-gt`(greater than), `-eq`(equal to), `-lt`(less than) 연산자를 사용하여 숫자 비교를 수행한다.
 
+## RELATIONAL OPERATORS
+
+### 설명
+- 관계 연산자는 숫자 및 문자열을 비교하는 데 사용된다.
+- `[[ ... ]]` 내에서 문자열 비교를 수행할 때는 `<`, `>` 기호를 사용해야 한다.
+
+### 연산자 목록
+| 의미 | 숫자 비교 | 문자열 비교 |
+|------|---------|------------|
+| 크다 | `-gt` | `str1 > str2` |
+| 크거나 같다 | `-ge` | 없음 |
+| 작다 | `-lt` | `str1 < str2` |
+| 작거나 같다 | `-le` | 없음 |
+| 같다 | `-eq` | `=` 또는 `==` |
+| 다르다 | `-ne` | `!=` |
+| 문자열 길이가 0보다 큼 | 없음 | `-n str` |
+| 문자열 길이가 0임 | 없음 | `-z str` |
+
+---
+
+## COMPOUND LOGICAL EXPRESSIONS
+
+### 설명
+- `!`, `&&`, `||` 연산자를 사용하여 여러 조건을 결합할 수 있다.
+- `[[ ... ]]` 구문을 사용하여 복합 조건을 평가해야 한다.
+
+### 연산자 목록
+| 연산자 | 의미 |
+|--------|------|
+| `!` | NOT (부정) |
+| `&&` | AND (논리곱) |
+| `||` | OR (논리합) |
+
+---
+
+## EXAMPLE: USING THE `!` OPERATOR
+
+```sh
+#!/bin/bash
+read -p "Enter years of work: " Years
+if [ ! "$Years" -lt 20 ]; then
+    echo "You can retire now."
+else
+    echo "You need 20+ years to retire"
+fi
+```
+- 입력한 근무 연수가 20년 미만이면 "You need 20+ years to retire" 출력.
+- `!` 연산자를 사용하여 `"$Years" -lt 20` 조건을 부정.
+
+---
+
+## EXAMPLE: USING THE `&&` OPERATOR
+
+```sh
+#!/bin/bash
+Bonus=500
+read -p "Enter Status: " Status
+read -p "Enter Shift: " Shift
+if [[ "$Status" = "H" && "$Shift" = 3 ]]
+then
+    echo "shift $Shift gets \$$Bonus bonus"
+else
+    echo "only hourly workers in"
+    echo "shift 3 get a bonus"
+fi
+```
+- `&&` 연산자를 사용하여 두 조건이 모두 참일 경우 실행.
+- `Status`가 `H`(Hourly)이고 `Shift`가 3이면 보너스를 지급.
+
+
+
 
 
 
