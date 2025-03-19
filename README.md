@@ -117,19 +117,20 @@ echo "Last name: $last"
 # IF STATEMENT (if 문)
 
 ## 기본 구조
-if command
-then
-    statements
-fi
+if command  
+then  
+    statements  
+fi  
 
 ## 설명
-- `command` 가 성공(리턴 상태 `0`)하면 `then` 블록 내의 `statements` 가 실행됨.
-- `command` 가 실패(리턴 상태 `0`이 아님)하면 `then` 블록을 건너뜀.
+- `command` 가 성공(리턴 상태 `0`)하면 `then` 블록 내의 `statements` 가 실행됨.  
+- `command` 가 실패(리턴 상태 `0`이 아님)하면 `then` 블록을 건너뜀.  
 
 ## 동작 방식
-1. `command` 실행 후 종료 상태 확인
-2. 종료 상태가 `0`이면 `then` 블록 실행
-3. 종료 상태가 `0`이 아니면 `then` 블록 건너뜀
+1. `command` 실행 후 종료 상태 확인  
+2. 종료 상태가 `0`이면 `then` 블록 실행  
+3. 종료 상태가 `0`이 아니면 `then` 블록 건너뜀  
+
 
 
 
