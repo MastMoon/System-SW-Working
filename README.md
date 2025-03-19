@@ -25,90 +25,24 @@ chmod +x script.sh
 
 # BASH SHELL PROGRAMMING
 
-## Input
-# 사용자 입력 (Prompting User)
-#!/bin/bash
-echo "이름을 입력하세요:"
-read name
-echo "안녕하세요, $name!"
-
-# 명령줄 인수 (Command Line Arguments)
-#!/bin/bash
-echo "첫 번째 인수: $1"
-echo "두 번째 인수: $2"
-echo "모든 인수: $@"
-# 실행: ./script.sh Hello World
+## Input (입력)
+- 사용자가 입력한 값을 받을 수 있으며, `read` 명령어를 사용해 입력을 변수에 저장할 수 있다.
+- 명령줄 인수(Command Line Arguments)를 통해 스크립트 실행 시 값을 전달할 수도 있다.
 
 ## Decision (조건문)
-# if-then-else
-#!/bin/bash
-echo "숫자를 입력하세요:"
-read num
-if [ $num -gt 10 ]; then
-    echo "입력한 숫자가 10보다 큽니다."
-elif [ $num -eq 10 ]; then
-    echo "입력한 숫자가 10과 같습니다."
-else
-    echo "입력한 숫자가 10보다 작습니다."
-fi
-
-# case 문
-#!/bin/bash
-echo "옵션을 선택하세요 (start/stop/restart):"
-read option
-case $option in
-    start) echo "서비스 시작";;
-    stop) echo "서비스 중지";;
-    restart) echo "서비스 재시작";;
-    *) echo "잘못된 입력";;
-esac
+- `if-then-else` 문을 사용해 조건을 평가하고 특정 동작을 수행할 수 있다.
+- `case` 문을 사용하면 여러 가지 옵션을 처리하는 것이 더 간결해진다.
 
 ## Repetition (반복문)
-# while 문 (do-while)
-#!/bin/bash
-count=1
-while [ $count -le 5 ]; do
-    echo "반복 횟수: $count"
-    ((count++))
-done
-
-# for 문
-#!/bin/bash
-for i in {1..5}; do
-    echo "반복 횟수: $i"
-done
-
-# until 문 (repeat-until)
-#!/bin/bash
-count=1
-until [ $count -gt 5 ]; do
-    echo "반복 횟수: $count"
-    ((count++))
-done
-
-# select 문 (메뉴 선택)
-#!/bin/bash
-echo "원하는 옵션을 선택하세요:"
-select option in 시작 중지 종료; do
-    case $option in
-        시작) echo "서비스 시작"; break ;;
-        중지) echo "서비스 중지"; break ;;
-        종료) echo "스크립트 종료"; exit ;;
-        *) echo "잘못된 선택입니다." ;;
-    esac
-done
+- `while` 문은 조건이 참일 동안 반복 실행된다.
+- `for` 문을 사용하면 지정된 범위 내에서 반복할 수 있다.
+- `until` 문은 조건이 거짓일 때 반복 실행된다.
+- `select` 문을 사용하면 사용자가 여러 옵션 중 하나를 선택하도록 할 수 있다.
 
 ## Functions (함수)
-#!/bin/bash
-function say_hello {
-    echo "안녕하세요, $1!"
-}
-say_hello "사용자"
+- 함수를 정의하면 같은 코드를 여러 번 사용해야 할 때 효율적으로 재사용할 수 있다.
+- 함수는 특정 작업을 수행하는 코드 블록이며, 호출 시 필요한 값을 전달할 수도 있다.
 
-## Traps (트랩, Ctrl+C 방지)
-#!/bin/bash
-trap "echo 'Ctrl+C가 감지되었습니다! 종료하지 않습니다.'" SIGINT
-while true; do
-    echo "프로그램 실행 중... (Ctrl+C를 눌러보세요)"
-    sleep 2
-done
+## Traps (트랩)
+- `trap` 명령어를 사용하면 특정 신호(예: Ctrl+C)가 입력될 때 원하는 동작을 지정할 수 있다.
+- 이를 통해 스크립트가 강제 종료되는 것을 방지하거나, 종료 전에 특정 작업을 수행할 수 있다.
