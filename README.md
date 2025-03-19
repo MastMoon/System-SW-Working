@@ -72,16 +72,17 @@ echo "First name: $first"
 echo "Last name: $last"
 ```
 
-# SPECIAL SHELL VARIABLES
+# SPECIAL SHELL VARIABLES (특수 쉘 변수)
 
-| Parameter | Meaning |
+| 변수      | 의미 |
 |-----------|------------------------------------------------|
-| `$0`      | Name of the current shell script              |
-| `$1-$9`   | Positional parameters 1 through 9            |
-| `$#`      | The number of positional parameters          |
-| `$*`      | All positional parameters (as a single string) |
-| `$@`      | All positional parameters (as separate strings) |
-| `$?`      | Return status of the most recently executed command |
-| `$$`      | Process ID of the current process            |
+| `$0`      | 현재 실행 중인 쉘 스크립트의 이름 |
+| `$1-$9`   | 첫 번째부터 아홉 번째까지의 위치 매개변수 |
+| `$#`      | 전달된 위치 매개변수의 개수 |
+| `$*`      | 모든 위치 매개변수 (하나의 문자열로 처리) |
+| `$@`      | 모든 위치 매개변수 (각각 별개의 문자열로 처리) |
+| `$?`      | 가장 최근 실행한 명령어의 종료 상태 (0: 성공, 1 이상: 오류) |
+| `$$`      | 현재 실행 중인 프로세스의 ID (PID) |
+
 
 
