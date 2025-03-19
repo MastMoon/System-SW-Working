@@ -117,10 +117,12 @@ echo "Last name: $last"
 # IF STATEMENT (if 문)
 
 ## 기본 구조
-if command  
-then  
-    statements  
-fi  
+```sh
+if command
+then
+    statements
+fi
+```
 
 ## 설명
 - `command` 가 성공(리턴 상태 `0`)하면 `then` 블록 내의 `statements` 가 실행됨.  
