@@ -886,10 +886,10 @@ fun
 ### 예제: 매개변수가 있는 함수
 ```sh
 #!/bin/sh
-#!/bin/bash # 이거를 적어야함.
+#!/bin/bash # 이거를 적어야 밑에 bash 전용 문법이 에러 없이 잘 작동함.
 testfile() {
     if [ $# -gt 0 ]; then
-        if [[ -f $1 && -r $1 ]]; then //bash 지원
+        if [[ -f $1 && -r $1 ]]; then //[[ ... ]]는 bash 전용 문법입니다.
             echo "$1 is a readable file"
         else
             echo "$1 is not a readable file"
