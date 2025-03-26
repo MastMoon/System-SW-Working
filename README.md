@@ -939,20 +939,3 @@ echo $inside  # 출력되지 않음
 ```
 
 ---
-
-# LOOPING OVER ARGUMENTS
-
-### 설명
-- 가장 간단한 형태의 `for` 루프는 커맨드 라인에서 전달된 모든 인수를 반복 실행한다.
-
-```sh
-#!/bin/bash
-for parm
-do
-    echo $parm
-done
-```
-- 실행 시 전달된 인수들을 하나씩 출력함.
-- 예를 들어, `./script.sh arg1 arg2 arg3`를 실행하면 `arg1`, `arg2`, `arg3`가 차례로 출력됨.
-
----
