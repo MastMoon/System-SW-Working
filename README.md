@@ -716,3 +716,243 @@ done
 
 
 ---
+
+# SELECT COMMAND
+
+### 설명
+- `select` 문은 간단한 메뉴를 만들기 위해 사용되며, 사용자로부터 번호 입력을 받는다.
+- 각 번호는 리스트 내 단어의 인덱스(1부터 시작)를 나타낸다.
+- 루프는 사용자가 `Ctrl+D` 또는 `Ctrl+C`를 누를 때까지 계속된다.
+
+### Syntax
+```sh
+select WORD in LIST
+do
+    RESPECTIVE-COMMANDS
+done
+```
+
+### 예제
+```sh
+#!/bin/bash
+select var in alpha beta gamma
+do
+    echo $var
+done
+```
+- 출력 예시:
+```
+1) alpha
+2) beta
+3) gamma
+#? 2
+beta
+#? 1
+alpha
+```
+
+---
+
+### 상세 기능
+- `PS3` 변수는 사용자에게 표시되는 프롬프트 메시지를 설정한다.
+- `$REPLY`는 사용자가 입력한 번호를 저장한다.
+
+```sh
+#!/bin/bash
+PS3="select entry or ^D: "
+select var in alpha beta
+do
+    echo "$REPLY = $var"
+done
+```
+
+---
+
+### 실용 예제: 파일 보호 스크립트
+```sh
+#!/bin/bash
+echo "script to make files private"
+echo "Select file to protect:"
+select FILENAME in *
+do
+    echo "You picked $FILENAME ($REPLY)"
+    chmod go-rwx "$FILENAME"
+    echo "it is now private"
+done
+```
+
+---
+
+# BREAK AND CONTINUE
+
+### BREAK
+- 루프를 즉시 종료하고 루프 다음 문장으로 이동한다.
+
+```sh
+while [ condition ]
+do
+    cmd-1
+    break
+    cmd-n
+ done
+echo "done"
+```
+
+### CONTINUE
+- 현재 반복을 건너뛰고 다음 반복으로 이동한다.
+
+```sh
+while [ condition ]
+do
+    cmd-1
+    continue
+    cmd-n
+done
+echo "done"
+```
+
+---
+
+### 예제: break & continue
+```sh
+for index in 1 2 3 4 5 6 7 8 9 10
+do
+    if [ $index -le 3 ]; then
+        echo "continue"
+        continue
+    fi
+    echo $index
+    if [ $index -ge 8 ]; then
+        echo "break"
+        break
+    fi
+done
+```
+
+---
+
+# SHELL FUNCTIONS
+
+### 설명
+- 함수는 나중에 실행하기 위해 명령어 시퀀스를 저장할 수 있는 블록이다.
+- 함수는 호출한 동일한 셸 내에서 실행되며, `.profile`, 스크립트 또는 커맨드라인에서 정의 가능하다.
+- 함수 제거는 `unset` 사용.
+
+### Syntax
+```sh
+function_name () {
+    statements
+}
+```
+
+---
+
+### 예제: 간단한 함수
+```sh
+#!/bin/bash
+funky () {
+    echo "This is a funky function."
+    echo "Now exiting funky function."
+}
+funky
+```
+
+---
+
+### 예제: 반복 함수
+```sh
+#!/bin/bash
+fun () {
+    JUST_A_SECOND=1
+    let i=0
+    REPEATS=30
+    echo "And now the fun really begins."
+    while [ $i -lt $REPEATS ]
+    do
+        echo "-------FUNCTIONS are fun-------->"
+        sleep $JUST_A_SECOND
+        let i+=1
+    done
+}
+fun
+```
+
+---
+
+### 함수 인자
+- `$1`, `$2`, ..., `$#`로 접근 가능
+- `$0`은 여전히 스크립트 이름
+
+### 예제: 매개변수가 있는 함수
+```sh
+#!/bin/sh
+testfile() {
+    if [ $# -gt 0 ]; then
+        if [[ -f $1 && -r $1 ]]; then
+            echo "$1 is a readable file"
+        else
+            echo "$1 is not a readable file"
+        fi
+    fi
+}
+testfile .
+testfile funtest
+```
+
+---
+
+### 예제: 여러 인자 처리
+```sh
+#!/bin/bash
+checkfile() {
+    for file
+do
+    if [ -f "$file" ]; then
+        echo "$file is a file"
+    elif [ -d "$file" ]; then
+        echo "$file is a directory"
+    fi
+done
+}
+checkfile . funtest
+```
+
+---
+
+### 지역 변수 (local)
+- 함수 내의 변수는 기본적으로 **전역**이다.
+- `local` 키워드를 사용하면 함수 내부에 **지역 변수**를 만들 수 있다.
+
+```sh
+#!/bin/bash
+global="pretty good variable"
+foo () {
+    local inside="not so good variable"
+    echo $global
+    echo $inside
+    global="better variable"
+}
+echo $global
+foo
+echo $global
+echo $inside  # 출력되지 않음
+```
+
+---
+
+# LOOPING OVER ARGUMENTS
+
+### 설명
+- 가장 간단한 형태의 `for` 루프는 커맨드 라인에서 전달된 모든 인수를 반복 실행한다.
+
+```sh
+#!/bin/bash
+for parm
+do
+    echo $parm
+done
+```
+- 실행 시 전달된 인수들을 하나씩 출력함.
+- 예를 들어, `./script.sh arg1 arg2 arg3`를 실행하면 `arg1`, `arg2`, `arg3`가 차례로 출력됨.
+
+---
