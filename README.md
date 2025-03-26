@@ -886,9 +886,10 @@ fun
 ### 예제: 매개변수가 있는 함수
 ```sh
 #!/bin/sh
+#!/bin/bash # 이거를 적어야함.
 testfile() {
     if [ $# -gt 0 ]; then
-        if [[ -f $1 && -r $1 ]]; then
+        if [[ -f $1 && -r $1 ]]; then //bash 지원
             echo "$1 is a readable file"
         else
             echo "$1 is not a readable file"
