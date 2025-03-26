@@ -813,7 +813,8 @@ echo "done"
 
 ---
 
-<mark> ### 예제: break & continue </mark>
+<mark> 중요 </mark>
+### 예제: break & continue
 ```sh
 for index in 1 2 3 4 5 6 7 8 9 10
 do
