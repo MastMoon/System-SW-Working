@@ -1011,6 +1011,7 @@ echo $inside  # 출력되지 않음
 - [8. Xen 가상화](#8-xen-가상화)
 - [9. KVM 가상화](#9-kvm-가상화)
 - [10. 컨테이너 가상화](#10-컨테이너-가상화)
+- [11. Docker 설치 및 Node.js 사용법](#11-docker-설치-및-nodejs-사용법)
 
 ---
 
@@ -1216,3 +1217,136 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 ```
 
 ---
+
+
+
+---
+
+## 11. Docker 설치 및 Node.js 사용법
+
+### 11.1 Docker 설치 (Ubuntu 기준)
+
+1. **기존 Docker 패키지 제거 (선택 사항):**
+
+   ```bash
+   sudo apt-get remove docker docker-engine docker.io containerd runc
+   ```
+
+2. **필수 패키지 업데이트 및 설치:**
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install ca-certificates curl gnupg lsb-release -y
+   ```
+
+3. **Docker 공식 GPG 키 및 저장소 설정:**
+
+   ```bash
+   sudo mkdir -p /etc/apt/keyrings
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   ```
+
+4. **Docker Engine 설치:**
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+   ```
+
+5. **설치 확인 및 사용자 그룹 추가 (sudo 없이 사용):**
+
+   ```bash
+   docker --version
+   sudo usermod -aG docker $USER
+   # 변경 사항 적용: 로그아웃 후 재로그인 또는 터미널 재시작
+   ```
+
+6. **테스트 실행:**
+
+   ```bash
+   docker run hello-world
+   ```
+
+### 11.2 Node.js 설치 및 사용
+
+#### Node.js를 로컬에 설치하는 방법 (nvm 사용 권장)
+
+1. **NVM(Node Version Manager) 설치:**
+
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+   source ~/.bashrc  # 또는 ~/.profile, ~/.zshrc
+   ```
+
+2. **Node.js LTS 버전 설치:**
+
+   ```bash
+   nvm install --lts
+   nvm use --lts
+   node --version
+   npm --version
+   ```
+
+#### Node.js 애플리케이션 Docker 컨테이너화
+
+1. **프로젝트 디렉터리 생성 및 초기화:**
+
+   ```bash
+   mkdir my-node-app
+   cd my-node-app
+   npm init -y
+   ```
+
+2. **간단한 Node.js 애플리케이션 (예: app.js) 작성:**
+
+   ```javascript
+   // app.js
+   const http = require('http');
+   const port = 3000;
+   const server = http.createServer((req, res) => {
+       res.writeHead(200, {'Content-Type': 'text/plain'});
+       res.end('Hello, Node.js in Docker!\n');
+   });
+   server.listen(port, () => {
+       console.log(`Server running at http://localhost:${port}/`);
+   });
+   ```
+
+3. **Dockerfile 작성:**
+
+   ```dockerfile
+   FROM node:14-alpine
+   WORKDIR /usr/src/app
+   COPY package*.json ./
+   RUN npm install
+   COPY . .
+   EXPOSE 3000
+   CMD ["node", "app.js"]
+   ```
+
+4. **이미지 빌드 및 컨테이너 실행:**
+
+   ```bash
+   docker build -t my-node-app .
+   docker run -p 3000:3000 my-node-app
+   ```
+
+5. **브라우저에서 테스트:**
+
+   ```
+   http://localhost:3000
+   ```
+
+---
+
+이 문서는 가상화의 주요 개념과 기술을 개괄하고, Docker와 Node.js를 설치하고 활용하는 방법을 구체적으로 설명합니다. 각 단계별 명령어와 설정 방법을 참고하여 본인 환경에 맞게 적용해 보시기 바랍니다.
+```
+
+---
+
+위와 같이 문서를 작성하면 가상화 전반에 대한 내용과 함께 Docker 설치 및 Node.js 사용법도 포함되는 포괄적인 문서를 만들 수 있습니다.
+
+
+
+
