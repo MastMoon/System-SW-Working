@@ -1222,302 +1222,305 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 
 ---
 
-## 11. Docker 설치 및 Node.js 사용법
+# 11. Docker 설치 및 Node.js 사용법 – 상세 가이드 (Ubuntu 기준)
 
-### 11.1 Docker 설치 (Ubuntu 기준)
-
-1. **기존 Docker 패키지 제거 (선택 사항):**
-
-   ```bash
-   # 기존에 설치된 Docker 관련 패키지가 있을 경우 제거
-   sudo apt-get remove docker docker-engine docker.io containerd runc
-   ```
-
-2. **필수 패키지 업데이트 및 설치:**
-
-   ```bash
-   # 시스템 업데이트 및 필수 패키지 설치
-   sudo apt-get update
-   sudo apt-get install ca-certificates curl gnupg lsb-release -y
-   ```
-
-3. **Docker 공식 GPG 키 및 저장소 설정:**
-
-   ```bash
-   # GPG 키 저장소 생성 및 Docker GPG 키 추가
-   sudo mkdir -p /etc/apt/keyrings
-   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-   
-   # Docker 저장소 등록 (현재 Ubuntu 릴리즈에 맞게)
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-   https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-   ```
-
-4. **Docker Engine 설치:**
-
-   ```bash
-   # Docker Engine 및 필수 도구 설치
-   sudo apt-get update
-   sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-   ```
-
-5. **설치 확인 및 사용자 그룹 추가 (sudo 없이 사용):**
-
-   ```bash
-   # Docker 버전 확인
-   docker --version
-   
-   # 현재 사용자를 docker 그룹에 추가 (sudo 없이 사용하기 위함)
-   sudo usermod -aG docker $USER
-   # 변경 사항 적용: 로그아웃 후 재로그인 또는 터미널 재시작 필요
-   ```
-
-6. **테스트 실행:**
-
-   ```bash
-   # 설치 확인용 테스트 컨테이너 실행
-   docker run hello-world
-   ```
+> 이 가이드는 Ubuntu에서 Docker를 설치하고, Node.js를 nvm으로 설치 및 활용하는 방법과 Docker Compose, Dockerfile을 통해 Node.js 애플리케이션을 컨테이너화하는 전 과정을 포함합니다.
 
 ---
 
-### 11.2 Node.js 설치 및 사용
+## 11.1 Docker 설치 (Ubuntu 기준)
 
-#### Node.js를 로컬에 설치하는 방법 (nvm 사용 권장)
-
-1. **NVM(Node Version Manager) 설치:**
-
-   ```bash
-   # NVM 설치 스크립트 실행
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-   # 설치 후 쉘 구성 파일 재로드 (예: bash의 경우)
-   source ~/.bashrc  # 또는 ~/.profile, ~/.zshrc
-   ```
-
-2. **Node.js LTS 버전 설치:**
-
-   ```bash
-   # 최신 LTS 버전 설치 및 사용
-   nvm install --lts
-   nvm use --lts
-   
-   # Node.js와 npm 버전 확인
-   node --version
-   npm --version
-   ```
-
-#### Node.js 애플리케이션 Docker 컨테이너화
-
-1. **프로젝트 디렉터리 생성 및 초기화:**
-
-   ```bash
-   # 프로젝트 폴더 생성 후 npm 초기화
-   mkdir my-node-app
-   cd my-node-app
-   npm init -y
-   ```
-
-2. **간단한 Node.js 애플리케이션 (예: app.js) 작성:**
-
-   ```javascript
-   // app.js
-   const http = require('http');
-   const port = 3000;
-   const server = http.createServer((req, res) => {
-       res.writeHead(200, {'Content-Type': 'text/plain'});
-       res.end('Hello, Node.js in Docker!\n');
-   });
-   server.listen(port, () => {
-       console.log(`Server running at http://localhost:${port}/`);
-   });
-   ```
-
-3. **Dockerfile 작성:**
-
-   아래는 Ubuntu 22.04 기반 이미지에 Nginx와 Node.js를 함께 설치한 예시입니다.  
-   필요에 따라 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
-
-   ```dockerfile
-   # 베이스 이미지로 Ubuntu 22.04 사용
-   FROM ubuntu:22.04
-
-   # 이미지 메타데이터 추가
-   LABEL maintainer="team@example.com"
-
-   # 환경 변수 설정
-   ENV APP_HOME=/app
-
-   # 패키지 업데이트 및 nginx, Node.js 설치
-   RUN apt-get update && \
-       apt-get install -y nginx curl gnupg && \
-       # NodeSource 스크립트를 통해 Node.js 16.x 설치 (버전을 원하는 대로 수정 가능)
-       curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-       apt-get install -y nodejs && \
-       apt-get clean
-
-   # 작업 디렉터리 설정
-   WORKDIR $APP_HOME
-
-   # 호스트의 파일들을 컨테이너로 복사
-   COPY . .
-
-   # 외부에 열 포트 지정 
-   # - 80: Nginx 기본 포트, 3000: Node.js 애플리케이션용 포트
-   EXPOSE 80 3000
-
-   # 컨테이너 실행 시 실행할 명령어 선택
-   # -------------------------------------------
-   # 1. Node.js 애플리케이션 실행 (app.js)
-   CMD ["node", "app.js"]
-
-   # 2. Nginx 실행 (리버스 프록시 등으로 사용)
-   # CMD ["nginx", "-g", "daemon off;"]
-   # -------------------------------------------
-   ```
-
-4. **이미지 빌드 및 컨테이너 실행:**
-
-   ```bash
-   # Docker 이미지를 "my-node-app" 태그로 빌드
-   docker build -t my-node-app .
-   
-   # 컨테이너 실행 시 호스트의 3000 포트를 컨테이너의 3000 포트에 매핑
-   # (Node.js 앱 사용 시)
-   docker run -p 3000:3000 my-node-app
-
-   # 만약 Nginx를 사용하려면, Dockerfile의 CMD를 nginx로 변경하고 아래와 같이 실행하세요.
-   # docker run -p 8080:80 my-node-app
-   ```
-
-5. **브라우저에서 테스트:**
-
-   ```
-   http://localhost:3000
-   ```
-
-   *Nginx를 사용하는 경우에는 매핑된 호스트 포트에 맞춰 접속합니다 (예: http://localhost:8080).*
-
----
-
-### 11.3 Docker Compose 설치 및 사용법
-
-#### 11.3.1 Docker Compose 설치
-
-1. **Docker Compose 최신 버전 다운로드:**
-
-   ```bash
-   # GitHub 릴리즈에서 시스템(OS, 아키텍처)에 맞는 Docker Compose 바이너리 다운로드
-   sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-   ```
-
-2. **실행 권한 부여:**
-
-   ```bash
-   # docker-compose 바이너리에 실행 권한 부여
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
-
-3. **설치 확인:**
-
-   ```bash
-   # Docker Compose 버전 확인
-   docker-compose --version
-   ```
-
-#### 11.3.2 Docker Compose 관련 명령어 (주석과 함께)
+### 1) 기존 Docker 패키지 제거 (선택 사항)
+이 단계는 이전에 설치된 Docker 패키지나 관련 도구들이 있다면 제거하는 과정입니다. 이미 설치되어 있지 않다면 생략해도 괜찮습니다.
 
 ```bash
-# docker-compose.yml 파일 기반으로 컨테이너들 빌드 및 실행 (백그라운드 실행)
-docker-compose up -d  
-# 주석: -d 옵션은 컨테이너를 백그라운드(detached) 모드로 실행합니다.
+#!/bin/bash
+set -e  # 에러 발생 시 스크립트를 종료
 
-# 실행 중인 컨테이너 목록 및 상태 확인
-docker-compose ps  
-# 주석: 현재 docker-compose로 관리 중인 컨테이너들의 상태를 보여줍니다.
+echo "기존 Docker 관련 패키지가 있는지 확인 후 제거합니다."
+sudo apt-get remove -y docker docker-engine docker.io containerd runc || true
+```
 
-# 로그 실시간 모니터링
-docker-compose logs -f  
-# 주석: -f 옵션은 로그를 실시간으로 출력합니다.
+### 2) 시스템 업데이트 및 필수 패키지 설치
+Docker 설치 전에 시스템 업데이트와 필요한 도구들을 설치합니다.
 
-# 특정 서비스 컨테이너 내부로 진입 (예: 'web'이라는 서비스)
-docker-compose exec web sh  
-# 주석: 'exec' 명령어를 사용하여 실행 중인 컨테이너 안에 접근, 여기서는 sh(쉘) 실행
+```bash
+#!/bin/bash
+set -e
 
-# 컨테이너 중지
-docker-compose stop  
-# 주석: 전체 서비스의 컨테이너를 중지합니다.
+echo "시스템 업데이트 및 필수 패키지 설치 중..."
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+```
 
-# 컨테이너 종료 및 자원 정리 (네트워크, 볼륨 등)
-docker-compose down  
-# 주석: 전체 서비스를 중지하고, 관련된 네트워크 등을 제거합니다.
+### 3) Docker 공식 GPG 키 추가 및 저장소 설정
+Docker 패키지를 신뢰할 수 있도록 GPG 키를 추가하고, Docker 저장소를 등록합니다.
 
-# 특정 서비스만 재빌드 (변경사항 적용)
-docker-compose build web  
-# 주석: docker-compose.yml 파일 내 'web' 서비스에 해당하는 이미지를 재빌드합니다.
+```bash
+#!/bin/bash
+set -e
 
-# 컨테이너 스케일 확장 (서비스의 인스턴스 수 조정)
-docker-compose up -d --scale web=3  
-# 주석: 'web' 서비스의 컨테이너 인스턴스를 3개로 확장하여 실행합니다.
+echo "Docker 공식 GPG 키 추가 및 저장소 설정 중..."
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# 현재 Ubuntu 릴리즈 이름(like focal, jammy 등)을 자동으로 적용하도록 함
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null <<EOF
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+EOF
+```
+
+### 4) Docker Engine 설치
+이제 Docker Engine, CLI, containerd를 설치합니다.
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Docker Engine 설치 중..."
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# 설치 확인
+echo "Docker 버전 확인:"
+docker --version
+```
+
+### 5) 현재 사용자 docker 그룹 추가 (sudo 없이 사용)
+Docker 명령어를 sudo 없이 사용하려면 현재 사용자를 docker 그룹에 추가해야 합니다.
+
+```bash
+#!/bin/bash
+set -e
+
+echo "현재 사용자를 docker 그룹에 추가합니다..."
+sudo usermod -aG docker $USER
+
+echo "변경 사항 적용을 위해 반드시 로그아웃 후 재로그인 하거나 터미널을 재시작하세요."
+```
+
+### 6) 설치 테스트: hello-world 컨테이너 실행
+설치가 잘 되었는지 테스트하기 위해 Docker의 기본 테스트 컨테이너를 실행합니다.
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Docker 설치 테스트: hello-world 실행..."
+docker run hello-world
 ```
 
 ---
 
-### 11.4 Docker 이미지 및 관련 명령어
+## 11.2 Node.js 설치 및 사용
 
-#### Docker 이미지란?
-- **Docker 이미지(Image):**  
-  컨테이너를 생성하기 위한 읽기 전용 템플릿입니다.  
-  - 운영 체제, 애플리케이션, 라이브러리 등 실행에 필요한 모든 요소가 포함되어 있습니다.
-  - Dockerfile을 이용해 이미지를 빌드하면 여러 레이어로 구성되며, 캐싱을 통해 효율적인 관리가 가능합니다.
+### [A] Node.js 로컬 설치 (nvm 권장)
+nvm(Node Version Manager)을 사용하면 여러 버전의 Node.js를 쉽게 설치하고 전환할 수 있습니다.
 
-#### 주요 Docker 이미지 관련 명령어
+#### 1) NVM 설치
+nvm 설치 스크립트를 실행하고, 쉘 초기화 파일(~/.bashrc 또는 ~/.profile 등)을 다시 로드합니다.
 
 ```bash
-# Docker 이미지 목록 확인  
-docker images  
-# 주석: 로컬에 저장된 Docker 이미지와 해당 태그, 크기 등을 확인합니다.
+#!/bin/bash
+set -e
 
-# Docker 이미지 빌드  
-docker build -t <이미지이름>:<태그> .
-# 예시: Dockerfile이 있는 현재 디렉터리에서 'my-nginx:latest' 이미지를 생성
-docker build -t my-nginx:latest .
+echo "nvm 설치 중..."
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
-# Docker 이미지 삭제  
-docker rmi <이미지ID 또는 이미지이름>:<태그>
-# 예시: 'my-nginx:latest' 이미지 삭제
-docker rmi my-nginx:latest
+# nvm 설치 후 현재 쉘에 nvm 적용 (bash의 경우)
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Docker 이미지 다운로드 (pull)  
-docker pull <이미지이름>:<태그>
-# 예시: 공식 nginx 이미지를 다운로드
-docker pull nginx:latest
+echo "nvm 설치 완료. 쉘 재시작 또는 source ~/.bashrc 를 실행하세요."
+```
 
-# Docker 이미지 업로드 (push)  
-# 주석: 이미지를 Docker Hub나 개인 레지스트리 등으로 업로드할 때 사용합니다.
-docker push <사용자명>/<이미지이름>:<태그>
-# 예시: Docker Hub에 이미지를 업로드 (먼저 로그인이 필요합니다)
-docker push myusername/my-nginx:latest
+#### 2) Node.js 최신 LTS 버전 설치 및 활성화
+
+```bash
+#!/bin/bash
+set -e
+
+echo "최신 LTS Node.js 버전 설치 중..."
+nvm install --lts
+nvm use --lts
+
+echo "Node.js 버전:" 
+node --version
+echo "npm 버전:" 
+npm --version
+```
+
+### [B] Node.js 애플리케이션 Docker 컨테이너화
+
+#### 1) 프로젝트 초기화 및 간단한 애플리케이션 작성
+프로젝트 디렉토리를 만들고, Node.js 애플리케이션을 초기화한 후 app.js 파일을 생성합니다.
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Node.js 프로젝트 폴더 생성 및 초기화 중..."
+mkdir -p my-node-app && cd my-node-app
+npm init -y
+
+# app.js 작성 (에디터를 사용해 아래 내용을 입력)
+cat <<'EOF' > app.js
+const http = require('http');
+const port = 3000;
+const server = http.createServer((req, res) => {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Hello, Node.js in Docker!\n');
+});
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
+});
+EOF
+
+echo "프로젝트 초기화 완료. app.js 파일이 생성되었습니다."
+```
+
+#### 2) Dockerfile 작성 – Node.js 애플리케이션 빌드를 위한 예제
+아래 예제는 단순한 Node.js 애플리케이션을 컨테이너화하는 Dockerfile입니다. 추가 설명을 포함하여 다단계 빌드를 적용할 수도 있습니다.
+
+```dockerfile
+# Dockerfile
+
+# 1단계: Node.js 의존성 설치 및 빌드 단계
+FROM node:18-alpine AS build
+
+# 작업 디렉터리 설정
+WORKDIR /app
+
+# package.json과 package-lock.json 복사 후 의존성 설치 (캐시 활용)
+COPY package*.json ./
+RUN npm install --production
+
+# 나머지 소스 코드 복사
+COPY . .
+
+# (선택 사항) 빌드 스크립트 실행 – 만약 React나 Vue 등 빌드가 필요한 앱이라면 사용
+# RUN npm run build
+
+# 2단계: 실제 실행 단계 – 간단히 Node.js 애플리케이션 실행
+FROM node:18-alpine
+
+WORKDIR /app
+
+# build 단계에서 설치된 모듈과 소스 복사
+COPY --from=build /app /app
+
+# 환경 변수 설정 (필요에 따라 수정)
+ENV PORT=3000
+
+# 포트 노출
+EXPOSE 3000
+
+# 컨테이너 시작 시 실행할 명령어
+CMD ["node", "app.js"]
+```
+
+#### 3) Docker 이미지 빌드 및 컨테이너 실행
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Docker 이미지 빌드 중..."
+docker build -t my-node-app:1.0 .
+
+echo "컨테이너 실행 중 (호스트의 3000 포트를 컨테이너의 3000 포트에 매핑)..."
+docker run -d -p 3000:3000 --name my-node-app-container my-node-app:1.0
+
+echo "컨테이너 실행 후 http://localhost:3000 에 접속해 확인하세요."
+```
+
+---
+
+## 11.3 Docker Compose 설치 및 사용법
+
+Docker Compose를 사용하면 다중 컨테이너 애플리케이션을 쉽게 정의하고 실행할 수 있습니다.
+
+### 1) Docker Compose 설치
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Docker Compose 설치 중..."
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+echo "설치 확인:"
+docker-compose --version
+```
+
+### 2) docker-compose.yml 파일 예제 (Node.js + MongoDB)
+아래 예제는 Node.js 웹 애플리케이션과 MongoDB 데이터베이스를 함께 사용하는 구성입니다.
+
+```yaml
+# docker-compose.yml
+version: '3.8'  # 최신 스펙 사용 가능
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+    depends_on:
+      - db
+    volumes:
+      - ./:/app  # 소스 코드 변경 즉시 반영 (개발환경에서 유용)
+  
+  db:
+    image: mongo:5.0
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - db-data:/data/db
+
+volumes:
+  db-data:
+```
+
+### 3) Docker Compose 명령어 사용 예
+
+```bash
+#!/bin/bash
+set -e
+
+# Compose를 이용해 백그라운드에서 컨테이너 실행
+echo "docker-compose up -d 실행 중..."
+docker-compose up -d
+
+# 실행된 서비스 확인
+docker-compose ps
+
+# 로그 실시간 모니터링 (원하는 서비스 이름 지정 가능)
+echo "docker-compose logs -f 실행 중..."
+docker-compose logs -f
+
+# 특정 컨테이너 내부 진입 (예, web 서비스)
+# docker-compose exec web sh
+
+# 서비스 중지 및 컨테이너 제거 (볼륨 삭제 포함)
+# docker-compose down -v
 ```
 
 ---
 
 ## 요약
 
-- **Docker Engine 설치:**  
-  Ubuntu 기준으로 Docker Engine, CLI, containerd를 설치하고 사용자 그룹에 추가하여 sudo 없이 사용 가능하게 설정합니다.
+- **Docker 설치:** Ubuntu에서 Docker를 설치하고, GPG 키 추가 및 저장소 설정, 그룹 추가 등을 통해 sudo 없이도 사용 가능하게 구성합니다.
+- **Node.js 설치:** nvm을 통해 최신 LTS 버전의 Node.js를 설치하며, 로컬 프로젝트와 함께 컨테이너화하는 과정을 포함합니다.
+- **Dockerfile 작성:** 다단계 빌드 방식을 적용해, 의존성 설치와 실행 단계를 분리하여 효율적인 이미지를 빌드합니다.
+- **Docker Compose:** 다중 컨테이너 애플리케이션(예: Node.js 웹 앱 + MongoDB)을 관리할 수 있는 docker-compose.yml 파일 예제와 주요 명령어를 소개합니다.
 
-- **Docker Compose 설치:**  
-  GitHub 릴리즈에서 다운로드 후 실행 권한 부여를 통해 다중 컨테이너 애플리케이션 관리가 용이해집니다.
-
-- **Node.js 사용법:**  
-  nvm을 통해 로컬에 설치하거나, 공식 Node.js 이미지를 기반으로 Docker 컨테이너를 만들어 Node.js 애플리케이션을 실행합니다.
-
-- **Docker 이미지:**  
-  컨테이너 생성을 위한 템플릿이며, Dockerfile을 통해 빌드되고 여러 명령어를 사용하여 관리할 수 있습니다.
-
-- **Docker Compose 관련 명령어:**  
-  `up`, `ps`, `logs`, `exec`, `stop`, `down`, `build`, `--scale` 등의 명령어로 다중 컨테이너 환경을 효율적으로 조작할 수 있습니다.
-
-이 문서를 참고하여 본인 환경에 맞게 Docker, Docker Compose, 그리고 Node.js를 설치하고 다양한 애플리케이션을 컨테이너화하여 관리해보시기 바랍니다.
+이와 같이 구성된 가이드를 통해 Docker 및 Node.js 기반 애플리케이션 구축에 대해 보다 자세히 학습하고, 실제 환경에서도 적용할 수 있을 것입니다. 추가적인 설명이나 특정 환경에 맞는 조정 사항은 실제 사용 시 환경에 맞게 수정하시기 바랍니다.
 
 ---
