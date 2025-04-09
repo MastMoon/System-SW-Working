@@ -106,7 +106,7 @@ read -p "prompt" varname [more vars]
 
 ### USER INPUT EXAMPLE
 ```sh
-#! /bin/sh
+#! /bin/bash
 read -p "enter your name: " first last
 echo "First name: $first"
 echo "Last name: $last"
@@ -174,8 +174,8 @@ test expression
 
 ### Example:
 ```sh
-if test -w "$1"
-then
+#!/bin/bash
+if [ -w "$1" ]; then
     echo "file $1 is write-able"
 else
     echo "file $1 is not write-able or does not exist"
@@ -337,19 +337,19 @@ fi
 ```sh
 # DOUBLE SQUARE BRACKETS
 read -p "Do you want to continue? " reply
-if [[ $reply = "y" ]]; then
+if [[ "$reply" = "y" ]]; then
     echo "You entered $reply"
 fi
 
 # SINGLE SQUARE BRACKETS
 read -p "Do you want to continue? " reply
-if [ $reply = "y" ]; then
+if [ "$reply" = "y" ]; then
     echo "You entered $reply"
 fi
 
 # "TEST" COMMAND
 read -p "Do you want to continue? " reply
-if test $reply = "y"; then
+if test "$reply" = "y"; then
     echo "You entered $reply"
 fi
 ```
@@ -364,7 +364,9 @@ fi
 #!/bin/bash
 read -p "Enter Income Amount: " Income
 read -p "Enter Expenses Amount: " Expense
-let Net=$Income-$Expense
+# 변수 초기화 후 산술연산 (let 사용 시 공백 없이)
+let Net=Income-Expense
+
 if [ "$Net" -eq "0" ]; then
     echo "Income and Expenses are equal - breakeven."
 elif [ "$Net" -gt "0" ]; then
@@ -417,13 +419,18 @@ echo "Enter N to see all non-hidden files"
 echo "Enter Q to quit"
 read -p "Enter your choice: " reply
 
-case $reply in
-    Y|YES) echo "Displaying all (really…) files"
-           ls -a ;;
-    N|NO)  echo "Displaying all non-hidden files..."
-           ls ;;
-    Q)     exit 0 ;;
-    *)     echo "Invalid choice!"; exit 1 ;;
+case "$reply" in
+    Y|YES)
+        echo "Displaying all (really…) files"
+        ls -a ;;
+    N|NO)
+        echo "Displaying all non-hidden files..."
+        ls ;;
+    Q)
+        exit 0 ;;
+    *)
+        echo "Invalid choice!"
+        exit 1 ;;
 esac
 ```
 
@@ -488,13 +495,16 @@ SeniorRate=7
 
 read -p "Enter your age: " age
 
-case $age in
-    [1-9]|[1][0-2])   # 어린이 요금 (1~12세)
-        echo "Your rate is $""$ChildRate.00" ;;
-    [1][3-9]|[2-5][0-9]) # 성인 요금 (13~59세)
-        echo "Your rate is $""$AdultRate.00" ;;
-    [6-9][0-9])       # 노인 요금 (60세 이상)
-        echo "Your rate is $""$SeniorRate.00" ;;
+case "$age" in
+    [1-9]|1[0-2])
+        echo "Your rate is \$${ChildRate}.00" ;;
+    1[3-9]|[2-5][0-9])
+        echo "Your rate is \$${AdultRate}.00" ;;
+    [6-9][0-9])
+        echo "Your rate is \$${SeniorRate}.00" ;;
+    *)
+        echo "Invalid age input."
+        exit 1 ;;
 esac
 ```
 
@@ -591,10 +601,9 @@ done
 ```sh
 #!/bin/bash
 COUNTER=0
-while [ $COUNTER -lt 10 ]
-do
+while [ "$COUNTER" -lt 10 ]; do
     echo "The counter is $COUNTER"
-    let COUNTER=$COUNTER+1
+    let COUNTER=COUNTER+1
 done
 ```
 - `COUNTER` 값이 10 미만인 동안 증가하면서 출력.
@@ -606,10 +615,10 @@ done
 ```sh
 #!/bin/bash
 Cont="Y"
-while [ $Cont = "Y" ]; do
+while [ "$Cont" = "Y" ]; do
     ps -A
-    read -p "Want to continue? (Y/N)" reply
-    Cont=`echo $reply | tr [:lower:] [:upper:]`
+    read -p "Want to continue? (Y/N) " reply
+    Cont=$(echo "$reply" | tr '[:lower:]' '[:upper:]')
 done
 echo "Done"
 ```
@@ -622,20 +631,19 @@ echo "Done"
 ### 예제 3: 특정 디렉토리에 파일을 시간별로 이동
 ```sh
 #!/bin/bash
-# 홈 디렉토리에서 웹 서버 디렉토리로 파일을 복사하는 스크립트
-# 새로운 디렉토리를 매 시간 생성
-PICSDIR=/home/carol/pics
-WEBDIR=/var/www/carol/webcam
+PICSDIR="/home/carol/pics"
+WEBDIR="/var/www/carol/webcam"
+
 while true; do
-    DATE=`date +%Y%m%d`
-    HOUR=`date +%H`
-    mkdir $WEBDIR/"$DATE"
-    while [ $HOUR -ne "00" ]; do
-        DESTDIR=$WEBDIR/"$DATE"/"$HOUR"
-        mkdir "$DESTDIR"
-        mv $PICSDIR/*.jpg "$DESTDIR"/
+    DATE=$(date +%Y%m%d)
+    HOUR=$(date +%H)
+    mkdir -p "$WEBDIR/$DATE"
+    while [ "$HOUR" -ne "00" ]; do
+        DESTDIR="$WEBDIR/$DATE/$HOUR"
+        mkdir -p "$DESTDIR"
+        mv "$PICSDIR"/*.jpg "$DESTDIR"/
         sleep 3600
-        HOUR=`date +%H`
+        HOUR=$(date +%H)
     done
 done
 ```
@@ -669,9 +677,8 @@ done
 ```sh
 #!/bin/bash
 COUNTER=20
-until [ $COUNTER -lt 10 ]
-do
-    echo $COUNTER
+until [ "$COUNTER" -lt 10 ]; do
+    echo "$COUNTER"
     let COUNTER-=1
 done
 ```
@@ -684,10 +691,10 @@ done
 ```sh
 #!/bin/bash
 Stop="N"
-until [ $Stop = "Y" ]; do
+until [ "$Stop" = "Y" ]; do
     ps -A
-    read -p "Want to stop? (Y/N)" reply
-    Stop=`echo $reply | tr [:lower:] [:upper:]`
+    read -p "Want to stop? (Y/N) " reply
+    Stop=$(echo "$reply" | tr '[:lower:]' '[:upper:]')
 done
 echo "Done"
 ```
@@ -717,10 +724,10 @@ done
 
 ```sh
 #!/bin/bash
-for i in 7 9 2 3 4 5
-do
-    echo $i
+for i in 7 9 2 3 4 5; do
+    echo "$i"
 done
+
 ```
 - `7 9 2 3 4 5` 값들을 `i`에 할당하며 반복 실행.
 - 각 값이 차례로 출력됨.
@@ -731,13 +738,12 @@ done
 
 ```sh
 #!/bin/bash
-# Compute the average weekly temperature
-for num in 1 2 3 4 5 6 7
-do
+TempTotal=0
+for num in 1 2 3 4 5 6 7; do
     read -p "Enter temp for day $num: " Temp
-    let TempTotal=$TempTotal+$Temp
+    let TempTotal=TempTotal+Temp
 done
-let AvgTemp=$TempTotal/7
+let AvgTemp=TempTotal/7
 echo "Average temperature: $AvgTemp"
 ```
 - 사용자에게 7일간의 온도를 입력받아 합산.
@@ -752,9 +758,8 @@ echo "Average temperature: $AvgTemp"
 
 ```sh
 #!/bin/bash
-for parm
-do
-    echo $parm
+for parm; do
+    echo "$parm"
 done
 ```
 - 실행 시 전달된 인수들을 하나씩 출력함.
@@ -807,8 +812,7 @@ alpha
 ```sh
 #!/bin/bash
 PS3="select entry or ^D: "
-select var in alpha beta
-do
+select var in alpha beta; do
     echo "$REPLY = $var"
 done
 ```
@@ -818,13 +822,12 @@ done
 ### 실용 예제: 파일 보호 스크립트
 ```sh
 #!/bin/bash
-echo "script to make files private"
+echo "Script to make files private"
 echo "Select file to protect:"
-select FILENAME in *
-do
+select FILENAME in *; do
     echo "You picked $FILENAME ($REPLY)"
     chmod go-rwx "$FILENAME"
-    echo "it is now private"
+    echo "It is now private"
 done
 ```
 
@@ -862,14 +865,14 @@ echo "done"
 
 ### 예제: break & continue <mark> 중요! </mark>
 ```sh
-for index in 1 2 3 4 5 6 7 8 9 10
-do
-    if [ $index -le 3 ]; then
+#!/bin/bash
+for index in 1 2 3 4 5 6 7 8 9 10; do
+    if [ "$index" -le 3 ]; then
         echo "continue"
         continue
     fi
-    echo $index
-    if [ $index -ge 8 ]; then
+    echo "$index"
+    if [ "$index" -ge 8 ]; then
         echo "break"
         break
     fi
@@ -897,7 +900,7 @@ function_name () {
 ### 예제: 간단한 함수
 ```sh
 #!/bin/bash
-funky () {
+funky() {
     echo "This is a funky function."
     echo "Now exiting funky function."
 }
@@ -909,15 +912,14 @@ funky
 ### 예제: 반복 함수
 ```sh
 #!/bin/bash
-fun () {
-    JUST_A_SECOND=1
-    let i=0
-    REPEATS=30
+fun() {
+    local JUST_A_SECOND=1
+    local i=0
+    local REPEATS=30
     echo "And now the fun really begins."
-    while [ $i -lt $REPEATS ]
-    do
+    while [ "$i" -lt "$REPEATS" ]; do
         echo "-------FUNCTIONS are fun-------->"
-        sleep $JUST_A_SECOND
+        sleep "$JUST_A_SECOND"
         let i+=1
     done
 }
@@ -932,11 +934,10 @@ fun
 
 ### 예제: 매개변수가 있는 함수
 ```sh
-#!/bin/sh
-#!/bin/bash # 이거를 적어야 밑에 bash 전용 문법이 에러 없이 잘 작동함.
+#!/bin/bash
 testfile() {
     if [ $# -gt 0 ]; then
-        if [[ -f $1 && -r $1 ]]; then //[[ ... ]]는 bash 전용 문법입니다.
+        if [[ -f "$1" && -r "$1" ]]; then  # [[ ... ]]는 bash 전용 문법입니다.
             echo "$1 is a readable file"
         else
             echo "$1 is not a readable file"
@@ -953,14 +954,13 @@ testfile funtest
 ```sh
 #!/bin/bash
 checkfile() {
-    for file
-do
-    if [ -f "$file" ]; then
-        echo "$file is a file"
-    elif [ -d "$file" ]; then
-        echo "$file is a directory"
-    fi
-done
+    for file in "$@"; do
+        if [ -f "$file" ]; then
+            echo "$file is a file"
+        elif [ -d "$file" ]; then
+            echo "$file is a directory"
+        fi
+    done
 }
 checkfile . funtest
 ```
@@ -974,16 +974,16 @@ checkfile . funtest
 ```sh
 #!/bin/bash
 global="pretty good variable"
-foo () {
+foo() {
     local inside="not so good variable"
-    echo $global
-    echo $inside
+    echo "$global"
+    echo "$inside"
     global="better variable"
 }
-echo $global
+echo "$global"
 foo
-echo $global
-echo $inside  # 출력되지 않음
+echo "$global"
+echo "$inside"  # 출력되지 않음 (local 변수이므로 범위 밖)
 ```
 
 ---
