@@ -1496,6 +1496,5 @@ docker push myusername/my-nginx:latest
 
 이 문서를 참고하여 본인 환경에 맞게 Docker, Docker Compose, 그리고 Node.js를 설치하고 다양한 애플리케이션을 컨테이너화하여 관리해보시기 바랍니다.
 ```
-위 문서는 Docker Engine, Docker Compose 및 Docker 이미지를 포함하여 Node.js를 실행하는 방법까지 폭넓게 다룹니다. 필요에 따라 내용을 수정하고 확장하여 사용할 수 있습니다.
 
 ---
