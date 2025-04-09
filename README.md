@@ -1219,6 +1219,7 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 [각기 다른 OS] [각기 다른 OS]
 ```
 
+
 ---
 
 ## 11. Docker 설치 및 Node.js 사용법
@@ -1334,7 +1335,7 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 3. **Dockerfile 작성:**
 
    아래는 Ubuntu 22.04 기반 이미지에 Nginx와 Node.js를 함께 설치한 예시입니다.  
-   필요한 경우 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
+   필요에 따라 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
 
    ```dockerfile
    # 베이스 이미지로 Ubuntu 22.04 사용
@@ -1365,11 +1366,13 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
    EXPOSE 80 3000
 
    # 컨테이너 실행 시 실행할 명령어 선택
-   # (예시: Node.js 애플리케이션 실행)
+   # -------------------------------------------
+   # 1. Node.js 애플리케이션 실행 (app.js)
    CMD ["node", "app.js"]
 
-   # 만약 Nginx를 실행하고 싶다면 아래 CMD를 사용 (단, 한 컨테이너에 하나의 프로세스만 권장)
+   # 2. Nginx 실행 (리버스 프록시 등으로 사용)
    # CMD ["nginx", "-g", "daemon off;"]
+   # -------------------------------------------
    ```
 
 4. **이미지 빌드 및 컨테이너 실행:**
@@ -1379,7 +1382,11 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
    docker build -t my-node-app .
    
    # 컨테이너 실행 시 호스트의 3000 포트를 컨테이너의 3000 포트에 매핑
+   # (Node.js 앱 사용 시)
    docker run -p 3000:3000 my-node-app
+
+   # 만약 Nginx를 사용하려면, Dockerfile의 CMD를 nginx로 변경하고 아래와 같이 실행하세요.
+   # docker run -p 8080:80 my-node-app
    ```
 
 5. **브라우저에서 테스트:**
@@ -1387,6 +1394,8 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
    ```
    http://localhost:3000
    ```
+
+   *Nginx를 사용하는 경우에는 매핑된 호스트 포트에 맞춰 접속합니다 (예: http://localhost:8080).*
 
 ---
 
