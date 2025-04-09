@@ -1224,6 +1224,7 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 
 ---
 
+```markdown
 ## 11. Docker 설치 및 Node.js 사용법
 
 ### 11.1 Docker 설치 (Ubuntu 기준)
@@ -1336,25 +1337,43 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 
 3. **Dockerfile 작성:**
 
+   아래는 Ubuntu 22.04 기반 이미지에 Nginx와 Node.js를 함께 설치한 예시입니다.  
+   필요한 경우 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
+
    ```dockerfile
-   # 공식 Node.js 경량 이미지 사용 (여기서는 node:14-alpine 사용)
-   FROM node:14-alpine
-   
+   # 베이스 이미지로 Ubuntu 22.04 사용
+   FROM ubuntu:22.04
+
+   # 이미지 메타데이터 추가
+   LABEL maintainer="team@example.com"
+
+   # 환경 변수 설정
+   ENV APP_HOME=/app
+
+   # 패키지 업데이트 및 nginx, Node.js 설치
+   RUN apt-get update && \
+       apt-get install -y nginx curl gnupg && \
+       # NodeSource 스크립트를 통해 Node.js 16.x 설치 (버전을 원하는 대로 수정 가능)
+       curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+       apt-get install -y nodejs && \
+       apt-get clean
+
    # 작업 디렉터리 설정
-   WORKDIR /usr/src/app
-   
-   # package.json 및 package-lock.json 복사 후 의존성 설치
-   COPY package*.json ./
-   RUN npm install
-   
-   # 애플리케이션 소스 복사
+   WORKDIR $APP_HOME
+
+   # 호스트의 파일들을 컨테이너로 복사
    COPY . .
-   
-   # 컨테이너 외부에 노출할 포트 지정
-   EXPOSE 3000
-   
-   # 컨테이너 시작 시 실행할 명령어
+
+   # 외부에 열 포트 지정 
+   # - 80: Nginx 기본 포트, 3000: Node.js 애플리케이션용 포트
+   EXPOSE 80 3000
+
+   # 컨테이너 실행 시 실행할 명령어 선택
+   # (예시: Node.js 애플리케이션 실행)
    CMD ["node", "app.js"]
+
+   # 만약 Nginx를 실행하고 싶다면 아래 CMD를 사용 (단, 한 컨테이너에 하나의 프로세스만 권장)
+   # CMD ["nginx", "-g", "daemon off;"]
    ```
 
 4. **이미지 빌드 및 컨테이너 실행:**
@@ -1495,5 +1514,6 @@ docker push myusername/my-nginx:latest
   `up`, `ps`, `logs`, `exec`, `stop`, `down`, `build`, `--scale` 등의 명령어로 다중 컨테이너 환경을 효율적으로 조작할 수 있습니다.
 
 이 문서를 참고하여 본인 환경에 맞게 Docker, Docker Compose, 그리고 Node.js를 설치하고 다양한 애플리케이션을 컨테이너화하여 관리해보시기 바랍니다.
+```
 
 ---
