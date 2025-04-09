@@ -1010,11 +1010,26 @@ echo "$inside"  # 출력되지 않음 (local 변수이므로 범위 밖)
 - [8. Xen 가상화](#8-xen-가상화)
 - [9. KVM 가상화](#9-kvm-가상화)
 - [10. 컨테이너 가상화](#10-컨테이너-가상화)
-- [11. Docker 설치 및 Node.js 사용법](#11-docker-설치-및-nodejs-사용법--상세-가이드-ubuntu-기준)
-  - [11.1 Docker 설치 (Ubuntu 기준)](#111-docker-설치-ubuntu-기준)
-  - [11.2 Node.js 설치 및 사용](#112-nodejs-설치-및-사용)
-  - [11.3 Docker Compose 설치 및 사용법](#113-docker-compose-설치-및-사용법)
-  - [11.4 Docker 이미지 및 관련 명령어](#114-docker-이미지-및-관련-명령어)
+- [11. 개요 및 Docker 기본 개념](#11-개요-및-docker-기본-개념)
+  - [11.1 Docker란?](#111-docker란)
+  - [11.2 Docker 아키텍처](#112-docker-아키텍처)
+- [12. Docker 설치 가이드](#12-docker-설치-가이드)
+  - [12.1 Docker 설치 및 활용 가이드](#121-docker-설치-및-활용-가이드)
+- [13. Docker 이미지와 컨테이너 관리](#13-docker-이미지와-컨테이너-관리)
+  - [13.1 Docker 이미지 생성 및 Dockerfile](#131-docker-이미지-생성-및-dockerfile)
+  - [13.2 이미지 빌드 및 관리](#132-이미지-빌드-및-관리)
+  - [13.3 컨테이너 실행 및 관리](#133-컨테이너-실행-및-관리)
+- [14. Docker Desktop 및 Docker Compose](#14-docker-desktop-및-docker-compose)
+  - [14.1 Docker Desktop 사용 가이드](#141-docker-desktop-사용-가이드)
+  - [14.2 Docker Desktop 사용 방법](#142-docker-desktop-사용-방법)
+  - [14.3 Docker Compose 사용하기](#143-docker-compose-사용하기)
+- [15. Docker 주요 명령어 및 Best Practices](#15-docker-주요-명령어-및-best-practices)
+  - [15.1 기본 Docker 명령어](#151-기본-docker-명령어)
+  - [15.2 Best Practices](#152-best-practices)
+
+---
+
+이 목차는 README.md 파일 상단에 추가하여, 각 섹션과 하위 항목으로 빠르게 이동할 수 있도록 링크(anchor)를 제공합니다. 필요에 따라 추가 수정 및 보완하여 사용하세요.
 
 ---
 
@@ -1221,395 +1236,248 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 
 ---
 
-# 11. Docker 설치 및 Node.js 사용법 – 상세 가이드 (Ubuntu 기준)
+# Docker Guide and Exam Study Notes
 
-> 이 가이드는 Ubuntu에서 Docker를 설치하고, Node.js를 nvm으로 설치 및 활용하는 방법과 Docker Compose, Dockerfile을 통해 Node.js 애플리케이션을 컨테이너화하는 전 과정을 포함합니다.
+## 11. 개요 및 Docker 기본 개념
 
----
+### 11.1 Docker란?
+- **Docker**는 애플리케이션 개발, 배포, 실행을 위한 오픈소스 컨테이너 플랫폼입니다.
+- **컨테이너화(Containerization):** 애플리케이션과 그 의존성(코드, 라이브러리, 설정 등)을 하나의 패키지로 묶어 격리된 환경에서 실행  
+- **이식성(Portability):** “내 컴퓨터에서는 동작하는데…” 문제를 해결  
+- **경량성(Efficiency):** 가상 머신보다 빠른 부팅과 적은 자원 사용
 
-## 11.1 Docker 설치 (Ubuntu 기준)
-
-### 1) 기존 Docker 패키지 제거 (선택 사항)
-이 단계는 이전에 설치된 Docker 패키지나 관련 도구들이 있다면 제거하는 과정입니다. 이미 설치되어 있지 않다면 생략해도 괜찮습니다.
-
-```bash
-#!/bin/bash
-set -e  # 에러 발생 시 스크립트를 종료
-
-echo "기존 Docker 관련 패키지가 있는지 확인 후 제거합니다."
-sudo apt-get remove -y docker docker-engine docker.io containerd runc || true
-```
-
-### 2) 시스템 업데이트 및 필수 패키지 설치
-Docker 설치 전에 시스템 업데이트와 필요한 도구들을 설치합니다.
-
-```bash
-#!/bin/bash
-set -e
-
-echo "시스템 업데이트 및 필수 패키지 설치 중..."
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg lsb-release
-```
-
-### 3) Docker 공식 GPG 키 추가 및 저장소 설정
-Docker 패키지를 신뢰할 수 있도록 GPG 키를 추가하고, Docker 저장소를 등록합니다.
-
-```bash
-#!/bin/bash
-set -e
-
-echo "Docker 공식 GPG 키 추가 및 저장소 설정 중..."
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-# 현재 Ubuntu 릴리즈 이름(like focal, jammy 등)을 자동으로 적용하도록 함
-sudo tee /etc/apt/sources.list.d/docker.list > /dev/null <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-EOF
-```
-
-### 4) Docker Engine 설치
-이제 Docker Engine, CLI, containerd를 설치합니다.
-
-```bash
-#!/bin/bash
-set -e
-
-echo "Docker Engine 설치 중..."
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-# 설치 확인
-echo "Docker 버전 확인:"
-docker --version
-```
-
-### 5) 현재 사용자 docker 그룹 추가 (sudo 없이 사용)
-Docker 명령어를 sudo 없이 사용하려면 현재 사용자를 docker 그룹에 추가해야 합니다.
-
-```bash
-#!/bin/bash
-set -e
-
-echo "현재 사용자를 docker 그룹에 추가합니다..."
-sudo usermod -aG docker $USER
-
-echo "변경 사항 적용을 위해 반드시 로그아웃 후 재로그인 하거나 터미널을 재시작하세요."
-```
-
-### 6) 설치 테스트: hello-world 컨테이너 실행
-설치가 잘 되었는지 테스트하기 위해 Docker의 기본 테스트 컨테이너를 실행합니다.
-
-```bash
-#!/bin/bash
-set -e
-
-echo "Docker 설치 테스트: hello-world 실행..."
-docker run hello-world
-```
+### 11.2 Docker 아키텍처
+- **클라이언트-서버 모델:**
+  - **Docker Client:** 사용자가 명령어를 입력 (docker build, run 등)
+  - **Docker Daemon (dockerd):** 명령어 처리 및 컨테이너 관리
+  - **Docker Registry:** Docker 이미지 저장소 (예: Docker Hub)
+- **핵심 컴포넌트:**
+  - **이미지(Images):** 읽기 전용 템플릿으로, 애플리케이션 실행에 필요한 모든 요소 포함
+  - **컨테이너(Containers):** 이미지를 기반으로 실행되는 독립적 인스턴스
+  - **볼륨(Volumes):** 컨테이너 데이터의 영속성을 확보하기 위한 메커니즘
+  - **네트워크(Networks):** 컨테이너 간 통신을 위한 다양한 드라이버 (bridge, host, overlay, macvlan, none)
 
 ---
 
-## 11.2 Node.js 설치 및 사용
+## 12. Docker 설치 가이드
 
-### [A] Node.js 로컬 설치 (nvm 권장)
-nvm(Node Version Manager)을 사용하면 여러 버전의 Node.js를 쉽게 설치하고 전환할 수 있습니다.
+### 12.1 Docker 설치 및 활용 가이드
+#### 개요
+- Docker는 2013년 Docker, Inc에서 출시되었으며, AWS, Google Cloud, Microsoft Azure 등 주요 클라우드에서 공식 지원
+- 라이선스: Apache License 2.0
 
-#### 1) NVM 설치
-nvm 설치 스크립트를 실행하고, 쉘 초기화 파일(~/.bashrc 또는 ~/.profile 등)을 다시 로드합니다.
+#### 지원 운영체제 및 사양
+- **Windows:** Windows 10 (Pro, Enterprise, Education – 64bit, 최소 빌드 버전 요구)
+- **MacOS:** El Capitan 10.11 이상 (2010년도 모델 또는 신모델)
+- **Linux:** Fedora, CentOS, Debian, Ubuntu 등 각 배포판별 요구사항 존재
 
+#### 설치 예시
+
+**CentOS 설치 명령어:**
 ```bash
-#!/bin/bash
-set -e
-
-echo "nvm 설치 중..."
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-
-# nvm 설치 후 현재 쉘에 nvm 적용 (bash의 경우)
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-echo "nvm 설치 완료. 쉘 재시작 또는 source ~/.bashrc 를 실행하세요."
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce
+docker version
 ```
 
-#### 2) Node.js 최신 LTS 버전 설치 및 활성화
-
+**Ubuntu 설치 명령어:**
 ```bash
-#!/bin/bash
-set -e
-
-echo "최신 LTS Node.js 버전 설치 중..."
-nvm install --lts
-nvm use --lts
-
-echo "Node.js 버전:" 
-node --version
-echo "npm 버전:" 
-npm --version
+apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get install docker-ce
+docker version
 ```
 
-### [B] Node.js 애플리케이션 Docker 컨테이너화
+**Windows 설치 개요:**
+- Docker Store에서 설치 패키지 다운로드 ([Docker Desktop for Windows](https://store.docker.com/editions/community/docker-ce-desktop-windows))
+- 설치 후 Windows 로그아웃 후 재실행 및 PowerShell에서 `docker version` 명령어 확인
 
-#### 1) 프로젝트 초기화 및 간단한 애플리케이션 작성
-프로젝트 디렉토리를 만들고, Node.js 애플리케이션을 초기화한 후 app.js 파일을 생성합니다.
+---
 
-```bash
-#!/bin/bash
-set -e
+## 13. Docker 이미지와 컨테이너 관리
 
-echo "Node.js 프로젝트 폴더 생성 및 초기화 중..."
-mkdir -p my-node-app && cd my-node-app
-npm init -y
-
-# app.js 작성 (에디터를 사용해 아래 내용을 입력)
-cat <<'EOF' > app.js
-const http = require('http');
-const port = 3000;
-const server = http.createServer((req, res) => {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Hello, Node.js in Docker!\n');
-});
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
-EOF
-
-echo "프로젝트 초기화 완료. app.js 파일이 생성되었습니다."
-```
-
-#### 2) Dockerfile 작성 – Node.js 애플리케이션 빌드를 위한 예제
-아래는 Ubuntu 22.04 기반 이미지에 Nginx와 Node.js를 함께 설치한 예시입니다.  
-필요에 따라 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
-
-```dockerfile
-# 베이스 이미지로 Ubuntu 22.04 사용
+### 13.1 Docker 이미지 생성 및 Dockerfile
+#### Dockerfile 기본 구조 예제
+```Dockerfile
+# 베이스 이미지 선택
 FROM ubuntu:22.04
 
-# 이미지 메타데이터 추가
+# 메타데이터 추가
 LABEL maintainer="team@example.com"
 
 # 환경 변수 설정
 ENV APP_HOME=/app
 
-# 패키지 업데이트 및 nginx, Node.js 설치
-RUN apt-get update && \
-    apt-get install -y nginx curl gnupg && \
-    # NodeSource 스크립트를 통해 Node.js 16.x 설치 (버전을 원하는 대로 수정 가능)
-    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean
+# 패키지 설치 등 명령 실행
+RUN apt-get update && apt-get install -y nginx
 
-# 작업 디렉터리 설정
-WORKDIR $APP_HOME
+# 작업 디렉토리 설정
+WORKDIR /app
 
-# 호스트의 파일들을 컨테이너로 복사
+# 파일 복사
 COPY . .
 
-# 외부에 열 포트 지정 
-# - 80: Nginx 기본 포트, 3000: Node.js 애플리케이션용 포트
-EXPOSE 80 3000
+# 포트 노출
+EXPOSE 80
 
-# 컨테이너 실행 시 실행할 명령어 선택
-# -------------------------------------------
-# 1. Node.js 애플리케이션 실행 (app.js)
-CMD ["node", "app.js"]
-
-# 2. 만약 Nginx를 실행하고 싶다면 아래 CMD를 사용 (단, 한 컨테이너에 하나의 프로세스만 권장)
-# CMD ["nginx", "-g", "daemon off;"]
-# -------------------------------------------
+# 실행 명령
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
-#### 3) Docker 이미지 빌드 및 컨테이너 실행
+#### 주요 Dockerfile 명령어
+- **FROM:** 기본 이미지 지정
+- **RUN:** 이미지 빌드 시 명령어 실행
+- **COPY/ADD:** 파일/디렉터리 복사
+- **ENV:** 환경 변수 설정
+- **EXPOSE:** 컨테이너 외부에 노출할 포트 지정
+- **CMD/ENTRYPOINT:** 컨테이너 시작 시 실행할 기본 명령어 설정
 
+### 13.2 이미지 빌드 및 관리
+#### 이미지 빌드 예제
 ```bash
-#!/bin/bash
-set -e
+# 기본 빌드
+docker build -t my-app:1.0 .
 
-echo "Docker 이미지 빌드 중..."
-docker build -t my-node-app:1.0 .
+# 캐시 무시하고 빌드
+docker build --no-cache -t my-app:1.0 .
 
-echo "컨테이너 실행 중 (호스트의 3000 포트를 컨테이너의 3000 포트에 매핑)..."
-docker run -d -p 3000:3000 --name my-node-app-container my-node-app:1.0
+# 특정 Dockerfile 사용 (예: 프로덕션 환경)
+docker build -f Dockerfile.prod -t my-app:prod .
+```
 
-echo "컨테이너 실행 후 http://localhost:3000 에 접속해 확인하세요."
+#### 이미지 관리 및 레지스트리 사용
+```bash
+# 이미지 목록 확인
+docker images
+
+# 태그 추가 및 변경
+docker tag my-app:1.0 registry.example.com/my-app:1.0
+
+# 이미지 삭제
+docker rmi my-app:1.0
+
+# 레지스트리에 이미지 푸시
+docker push registry.example.com/my-app:1.0
+```
+
+### 13.3 컨테이너 실행 및 관리
+#### 컨테이너 실행 기본 명령어
+```bash
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+```
+
+#### 주요 옵션
+- `-d, --detach`: 백그라운드 실행
+- `-p, --publish`: 호스트와 컨테이너간 포트 매핑 (예: `-p 80:80`)
+- `-v, --volume`: 볼륨 마운트
+- `--name`: 컨테이너 이름 지정
+
+#### 컨테이너 상태 확인, 중지, 삭제
+```bash
+# 실행 중인 컨테이너 목록 확인
+docker ps
+
+# 모든 컨테이너 확인 (정지된 컨테이너 포함)
+docker ps -a
+
+# 컨테이너 중지
+docker stop <CONTAINER_NAME>
+
+# 컨테이너 삭제
+docker rm <CONTAINER_NAME>
 ```
 
 ---
 
-## 11.3 Docker Compose 설치 및 사용법
+## 14. Docker Desktop 및 Docker Compose
 
-### 1) Docker Compose 설치
+### 14.1 Docker Desktop 사용 가이드
+- **개요:** Docker Desktop은 Mac, Windows, Linux에서 Docker 컨테이너를 관리할 수 있는 GUI 도구입니다.
+- **포함 기능:** Docker Engine, CLI, Compose, Kubernetes, 이미지 및 볼륨 관리, 컨테이너 실행/정지 등
+- **설치:** 각 운영체제별 요구사항에 맞춰 Docker 웹사이트에서 설치 파일 다운로드
 
-```bash
-#!/bin/bash
-set -e
+### 14.2 Docker Desktop 사용 방법
+- **GUI 방식:**
+  - 'Images' 탭에서 원하는 이미지를 선택하고 'Run' 버튼을 클릭
+  - 컨테이너 설정(포트, 볼륨, 환경 변수 등)을 지정 후 실행
+- **명령어 방식:**
+  ```bash
+  # 예시: nginx 컨테이너 실행
+  docker run -d -p 80:80 nginx
+  
+  # 이름 지정 및 볼륨 마운트 실행
+  docker run -d --name my-nginx -p 8080:80 -v ./html:/usr/share/nginx/html nginx
+  ```
 
-echo "Docker Compose 설치 중..."
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-echo "설치 확인:"
-docker-compose --version
-```
-
-### 2) docker-compose.yml 파일 예제 (Node.js + MongoDB)
-아래 예제는 Node.js 웹 애플리케이션과 MongoDB 데이터베이스를 함께 사용하는 구성입니다.
-
+### 14.3 Docker Compose 사용하기
+#### Compose 파일 예제
 ```yaml
-# docker-compose.yml
-version: '3.8'  # 최신 스펙 사용 가능
-
+version: '3'
 services:
   web:
-    build: .
+    image: nginx
     ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=db
-    depends_on:
-      - db
-    volumes:
-      - ./:/app  # 소스 코드 변경 즉시 반영 (개발환경에서 유용)
-  
+      - "8080:80"
   db:
-    image: mongo:5.0
-    restart: always
+    image: mysql:5.7
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
-    volumes:
-      - db-data:/data/db
-
-volumes:
-  db-data:
+      MYSQL_ROOT_PASSWORD: example
 ```
 
-### 3) Docker Compose 명령어 사용 예
-
+#### 기본 Compose 명령어
 ```bash
-#!/bin/bash
-set -e
+# 모든 서비스 시작
+docker-compose up
 
-# Compose를 이용해 백그라운드에서 컨테이너 실행
-echo "docker-compose up -d 실행 중..."
+# 백그라운드 실행
 docker-compose up -d
 
-# 실행된 서비스 확인
-docker-compose ps
+# 서비스 중지
+docker-compose down
 
-# 로그 실시간 모니터링 (원하는 서비스 이름 지정 가능)
-echo "docker-compose logs -f 실행 중..."
-docker-compose logs -f
-
-# 특정 컨테이너 내부 진입 (예, web 서비스)
-# docker-compose exec web sh
-
-# 서비스 중지 및 컨테이너 제거 (볼륨 삭제 포함)
-# docker-compose down -v
+# 볼륨까지 모두 삭제 (주의)
+docker-compose down -v
 ```
 
 ---
 
-## 11.4 Docker 이미지 및 관련 명령어
+## 15. Docker 주요 명령어 및 best practices
 
-#### Docker 이미지란?
-- **Docker 이미지(Image):**  
-  컨테이너를 생성하기 위한 읽기 전용 템플릿입니다.  
-  - 운영 체제, 애플리케이션, 라이브러리 등 실행에 필요한 모든 요소가 포함되어 있습니다.
-  - Dockerfile을 이용해 이미지를 빌드하면 여러 레이어로 구성되며, 캐싱을 통해 효율적인 관리가 가능합니다.
+### 15.1 기본 Docker 명령어
+- **이미지 관련:**
+  ```bash
+  docker build -t myapp:1.0 .
+  docker images
+  docker pull nginx:latest
+  docker rmi myapp:1.0
+  ```
+- **컨테이너 관련:**
+  ```bash
+  docker run -d -p 8080:3000 --name mycontainer myapp:1.0
+  docker ps
+  docker ps -a
+  docker logs mycontainer
+  docker stop mycontainer
+  docker rm mycontainer
+  ```
 
-#### 주요 Docker 이미지 관련 명령어
-
-```bash
-# Docker 이미지 목록 확인  
-docker images  
-# 주석: 로컬에 저장된 Docker 이미지와 해당 태그, 크기 등을 확인합니다.
-
-# Docker 이미지 빌드  
-docker build -t <이미지이름>:<태그> .
-# 예시: Dockerfile이 있는 현재 디렉터리에서 'my-nginx:latest' 이미지를 생성
-docker build -t my-nginx:latest .
-
-# Docker 이미지 삭제  
-docker rmi <이미지ID 또는 이미지이름>:<태그>
-# 예시: 'my-nginx:latest' 이미지 삭제
-docker rmi my-nginx:latest
-
-# Docker 이미지 다운로드 (pull)  
-docker pull <이미지이름>:<태그>
-# 예시: 공식 nginx 이미지를 다운로드
-docker pull nginx:latest
-
-# Docker 이미지 업로드 (push)  
-# 주석: 이미지를 Docker Hub나 개인 레지스트리 등으로 업로드할 때 사용합니다.
-docker push <사용자명>/<이미지이름>:<태그>
-# 예시: Docker Hub에 이미지를 업로드 (먼저 로그인이 필요합니다)
-docker push myusername/my-nginx:latest
-```
-
----
-
-## 11.5 도커 기본 개념 및 핵심 내용
-
-다음은 도커의 핵심 개념과 관련 내용을 요약한 것입니다.
-
-1. **도커(Docker)란?**  
-   - **정의:**  
-     애플리케이션을 개발, 배포, 실행하기 위한 오픈소스 플랫폼입니다.  
-   - **핵심 개념:**  
-     - **컨테이너화:** 애플리케이션과 그 의존성을 하나의 패키지로 묶어, 격리된 환경에서 실행  
-     - **격리:** 각 컨테이너는 별도의 파일 시스템, 프로세스 공간, 네트워크 등을 갖고 독립적으로 동작  
-     - **이식성:** 동일한 이미지를 사용해 어느 환경에서나 애플리케이션을 동일하게 실행할 수 있습니다  
-     - **효율성:** 가상 머신보다 훨씬 가볍고, 빠른 시작 시간 및 낮은 리소스 사용
-
-2. **이미지 (Images)**  
-   - **역할:**  
-     컨테이너를 생성하기 위한 읽기 전용 템플릿입니다.
-   - **구성:**  
-     - 애플리케이션 코드, 런타임, 라이브러리, 설정 파일 등이 포함되어 있으며, 여러 레이어로 구성되어 캐싱과 재사용이 가능합니다.
-
-3. **컨테이너 (Containers)**  
-   - **역할:**  
-     이미지를 실행한 인스턴스로, 실제 애플리케이션이 실행되는 단위입니다.
-   - **특징:**  
-     - 격리된 환경에서 동작하며, 각 컨테이너는 독립적인 파일 시스템, 네트워크 인터페이스, CPU/메모리를 가집니다.
-     
-4. **도커 아키텍처**  
-   - **주요 구성 요소:**  
-     - **Docker CLI / Desktop:** 사용자의 명령어 입력 인터페이스  
-     - **Docker REST API:** Docker 클라이언트와 데몬 간의 통신 수단  
-     - **Docker 데몬 (dockerd):** 컨테이너, 이미지, 네트워크, 볼륨 등의 관리  
-     - **Docker 레지스트리:** 도커 이미지 저장소 (예: Docker Hub)
-
-5. **도커 네트워크 & 볼륨**  
-   - **네트워크:**  
-     컨테이너 간 통신을 위한 드라이버 (bridge, host, overlay 등)
-   - **볼륨:**  
-     데이터를 영구 저장하기 위한 메커니즘으로, 컨테이너 삭제 후에도 데이터 보존이 가능하며, 데이터 공유에 유용합니다.
-
-6. **Docker Compose**  
-   - **기능:**  
-     다중 컨테이너 애플리케이션을 정의하고 실행하기 위한 도구입니다.
-   - **주요 명령어:**  
-     `docker-compose up`, `docker-compose down`, `docker-compose ps`, `docker-compose logs` 등으로 관리합니다.
-
-7. **실제 활용 사례**  
-   - **개발 환경 표준화:** "내 컴퓨터에서는 작동합니다" 문제 해결  
-   - **마이크로서비스 아키텍처:** 각 서비스를 독립적으로 배포, 확장  
-   - **CI/CD 파이프라인:** 자동화된 빌드, 테스트, 배포  
-   - **클라우드 네이티브:** Kubernetes 등과의 통합으로 확장성 및 이식성 확보
-
----
-
-## 요약
-
-- **Docker 설치:** Ubuntu에서 Docker Engine, CLI, containerd를 설치하고, GPG 키 및 저장소 설정, 사용자 그룹 추가 등을 통해 sudo 없이 사용 가능하게 구성합니다.
-- **Docker Compose 설치:** GitHub 릴리즈를 통해 설치 후 실행 권한 부여를 통해 다중 컨테이너 애플리케이션 관리가 용이합니다.
-- **Node.js 사용법:** nvm을 통해 최신 LTS 버전의 Node.js를 설치하거나, 공식 Node.js 이미지를 사용해 Docker 컨테이너를 통해 애플리케이션을 실행합니다.
-- **Docker 이미지:** 도커 이미지는 컨테이너 생성을 위한 템플릿이며, Dockerfile로 빌드됩니다.
-- **Docker Compose 관련 명령어:** `up`, `ps`, `logs`, `exec`, `stop`, `down`, `build`, `--scale` 등으로 컨테이너 환경을 효율적으로 관리할 수 있습니다.
-- **도커 기본 개념 및 활용:** 도커의 컨테이너화, 격리, 이미지, 네트워크, 볼륨 등 기본 개념과 실제 활용 사례를 통해 애플리케이션의 이식성, 효율성, 표준화를 달성합니다.
+### 15.2 Best Practices
+- **Dockerfile 작성 시:**
+  - `.dockerignore` 파일 활용하여 불필요한 파일 제외
+  - 최소 베이스 이미지 선택 (ex. Alpine, slim)
+  - RUN 명령어를 체인으로 결합하여 레이어 수 최소화
+  - 캐시 활용 극대화 (자주 변경되는 파일은 나중에 복사)
+  - 가능하면 비루트 사용자로 실행
+  - 의존성 버전 명확하게 지정
+  - 개발/테스트/프로덕션별로 Dockerfile 분리
+- **보안:**
+  - 취약점 (예, CVE-2014-5282) 관련 업그레이드 및 패치 적용
+- **Compose 작성 시:**
+  - 환경 변수는 별도 파일로 관리
+  - 서비스 간 의존성 명확하게 지정 (depends_on 등)
 
 ---
