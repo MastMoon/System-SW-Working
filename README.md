@@ -1224,7 +1224,6 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 
 ---
 
-```markdown
 ## 11. Docker 설치 및 Node.js 사용법
 
 ### 11.1 Docker 설치 (Ubuntu 기준)
