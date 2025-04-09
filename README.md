@@ -1495,6 +1495,5 @@ docker push myusername/my-nginx:latest
   `up`, `ps`, `logs`, `exec`, `stop`, `down`, `build`, `--scale` 등의 명령어로 다중 컨테이너 환경을 효율적으로 조작할 수 있습니다.
 
 이 문서를 참고하여 본인 환경에 맞게 Docker, Docker Compose, 그리고 Node.js를 설치하고 다양한 애플리케이션을 컨테이너화하여 관리해보시기 바랍니다.
-```
 
 ---
