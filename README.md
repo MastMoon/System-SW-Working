@@ -1,7 +1,6 @@
 # System-SW-Working - 명령어 (수정 날짜: 25.03.26)
 
 ---
-
 ## 목차
 - [Shebang (쉘 인터프리터 지정)](#shebang-쉘-인터프리터-지정)
 - [BASH SHELL PROGRAMMING](#bash-shell-programming)
@@ -33,20 +32,20 @@
 - [THE UNTIL LOOP](#the-until-loop)
 - [EXAMPLE: USING THE UNTIL LOOP](#example-using-the-until-loop)
 - [THE FOR LOOP](#the-for-loop)
-- [EXAMPLE 1: THE FOR LOOP](#example-1-the-for-loop)
-- [EXAMPLE 2: USING THE FOR LOOP](#example-2-using-the-for-loop)
+  - [EXAMPLE 1: THE FOR LOOP](#example-1-the-for-loop)
+  - [EXAMPLE 2: USING THE FOR LOOP](#example-2-using-the-for-loop)
 - [LOOPING OVER ARGUMENTS](#looping-over-arguments)
 - [SELECT COMMAND](#select-command)
 - [BREAK AND CONTINUE](#break-and-continue)
 - [SHELL FUNCTIONS](#shell-functions)
-- [EXAMPLE: 간단한 함수](#예제-간단한-함수)
-- [EXAMPLE: 반복 함수](#예제-반복-함수)
-- [함수 인자](#함수-인자)
-- [EXAMPLE: 매개변수가 있는 함수](#예제-매개변수가-있는-함수)
-- [EXAMPLE: 여러 인자 처리](#예제-여러-인자-처리)
-- [지역 변수 (local)](#지역-변수-local)
-
+  - [EXAMPLE: 간단한 함수](#예제-간단한-함수)
+  - [EXAMPLE: 반복 함수](#예제-반복-함수)
+  - [함수 인자](#함수-인자)
+    - [EXAMPLE: 매개변수가 있는 함수](#예제-매개변수가-있는-함수)
+    - [EXAMPLE: 여러 인자 처리](#예제-여러-인자-처리)
+  - [지역 변수 (local)](#지역-변수-local)
 ---
+
 
 ## Shebang (쉘 인터프리터 지정)
 
