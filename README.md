@@ -1219,7 +1219,6 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
 [각기 다른 OS] [각기 다른 OS]
 ```
 
-
 ---
 
 # 11. Docker 설치 및 Node.js 사용법 – 상세 가이드 (Ubuntu 기준)
@@ -1266,8 +1265,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 # 현재 Ubuntu 릴리즈 이름(like focal, jammy 등)을 자동으로 적용하도록 함
 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
 EOF
 ```
 
@@ -1381,43 +1379,45 @@ echo "프로젝트 초기화 완료. app.js 파일이 생성되었습니다."
 ```
 
 #### 2) Dockerfile 작성 – Node.js 애플리케이션 빌드를 위한 예제
-아래 예제는 단순한 Node.js 애플리케이션을 컨테이너화하는 Dockerfile입니다. 추가 설명을 포함하여 다단계 빌드를 적용할 수도 있습니다.
+아래는 Ubuntu 22.04 기반 이미지에 Nginx와 Node.js를 함께 설치한 예시입니다.  
+필요에 따라 CMD 명령어를 수정하여 Node.js 애플리케이션(`app.js`)을 실행하거나, Nginx를 실행하도록 변경할 수 있습니다.
 
 ```dockerfile
-# Dockerfile
+# 베이스 이미지로 Ubuntu 22.04 사용
+FROM ubuntu:22.04
 
-# 1단계: Node.js 의존성 설치 및 빌드 단계
-FROM node:18-alpine AS build
+# 이미지 메타데이터 추가
+LABEL maintainer="team@example.com"
+
+# 환경 변수 설정
+ENV APP_HOME=/app
+
+# 패키지 업데이트 및 nginx, Node.js 설치
+RUN apt-get update && \
+    apt-get install -y nginx curl gnupg && \
+    # NodeSource 스크립트를 통해 Node.js 16.x 설치 (버전을 원하는 대로 수정 가능)
+    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean
 
 # 작업 디렉터리 설정
-WORKDIR /app
+WORKDIR $APP_HOME
 
-# package.json과 package-lock.json 복사 후 의존성 설치 (캐시 활용)
-COPY package*.json ./
-RUN npm install --production
-
-# 나머지 소스 코드 복사
+# 호스트의 파일들을 컨테이너로 복사
 COPY . .
 
-# (선택 사항) 빌드 스크립트 실행 – 만약 React나 Vue 등 빌드가 필요한 앱이라면 사용
-# RUN npm run build
+# 외부에 열 포트 지정 
+# - 80: Nginx 기본 포트, 3000: Node.js 애플리케이션용 포트
+EXPOSE 80 3000
 
-# 2단계: 실제 실행 단계 – 간단히 Node.js 애플리케이션 실행
-FROM node:18-alpine
-
-WORKDIR /app
-
-# build 단계에서 설치된 모듈과 소스 복사
-COPY --from=build /app /app
-
-# 환경 변수 설정 (필요에 따라 수정)
-ENV PORT=3000
-
-# 포트 노출
-EXPOSE 3000
-
-# 컨테이너 시작 시 실행할 명령어
+# 컨테이너 실행 시 실행할 명령어 선택
+# -------------------------------------------
+# 1. Node.js 애플리케이션 실행 (app.js)
 CMD ["node", "app.js"]
+
+# 2. 만약 Nginx를 실행하고 싶다면 아래 CMD를 사용 (단, 한 컨테이너에 하나의 프로세스만 권장)
+# CMD ["nginx", "-g", "daemon off;"]
+# -------------------------------------------
 ```
 
 #### 3) Docker 이미지 빌드 및 컨테이너 실행
@@ -1438,8 +1438,6 @@ echo "컨테이너 실행 후 http://localhost:3000 에 접속해 확인하세�
 ---
 
 ## 11.3 Docker Compose 설치 및 사용법
-
-Docker Compose를 사용하면 다중 컨테이너 애플리케이션을 쉽게 정의하고 실행할 수 있습니다.
 
 ### 1) Docker Compose 설치
 
@@ -1514,13 +1512,104 @@ docker-compose logs -f
 
 ---
 
+## 11.4 Docker 이미지 및 관련 명령어
+
+#### Docker 이미지란?
+- **Docker 이미지(Image):**  
+  컨테이너를 생성하기 위한 읽기 전용 템플릿입니다.  
+  - 운영 체제, 애플리케이션, 라이브러리 등 실행에 필요한 모든 요소가 포함되어 있습니다.
+  - Dockerfile을 이용해 이미지를 빌드하면 여러 레이어로 구성되며, 캐싱을 통해 효율적인 관리가 가능합니다.
+
+#### 주요 Docker 이미지 관련 명령어
+
+```bash
+# Docker 이미지 목록 확인  
+docker images  
+# 주석: 로컬에 저장된 Docker 이미지와 해당 태그, 크기 등을 확인합니다.
+
+# Docker 이미지 빌드  
+docker build -t <이미지이름>:<태그> .
+# 예시: Dockerfile이 있는 현재 디렉터리에서 'my-nginx:latest' 이미지를 생성
+docker build -t my-nginx:latest .
+
+# Docker 이미지 삭제  
+docker rmi <이미지ID 또는 이미지이름>:<태그>
+# 예시: 'my-nginx:latest' 이미지 삭제
+docker rmi my-nginx:latest
+
+# Docker 이미지 다운로드 (pull)  
+docker pull <이미지이름>:<태그>
+# 예시: 공식 nginx 이미지를 다운로드
+docker pull nginx:latest
+
+# Docker 이미지 업로드 (push)  
+# 주석: 이미지를 Docker Hub나 개인 레지스트리 등으로 업로드할 때 사용합니다.
+docker push <사용자명>/<이미지이름>:<태그>
+# 예시: Docker Hub에 이미지를 업로드 (먼저 로그인이 필요합니다)
+docker push myusername/my-nginx:latest
+```
+
+---
+
+## 11.5 도커 기본 개념 및 핵심 내용
+
+다음은 도커의 핵심 개념과 관련 내용을 요약한 것입니다.
+
+1. **도커(Docker)란?**  
+   - **정의:**  
+     애플리케이션을 개발, 배포, 실행하기 위한 오픈소스 플랫폼입니다.  
+   - **핵심 개념:**  
+     - **컨테이너화:** 애플리케이션과 그 의존성을 하나의 패키지로 묶어, 격리된 환경에서 실행  
+     - **격리:** 각 컨테이너는 별도의 파일 시스템, 프로세스 공간, 네트워크 등을 갖고 독립적으로 동작  
+     - **이식성:** 동일한 이미지를 사용해 어느 환경에서나 애플리케이션을 동일하게 실행할 수 있습니다  
+     - **효율성:** 가상 머신보다 훨씬 가볍고, 빠른 시작 시간 및 낮은 리소스 사용
+
+2. **이미지 (Images)**  
+   - **역할:**  
+     컨테이너를 생성하기 위한 읽기 전용 템플릿입니다.
+   - **구성:**  
+     - 애플리케이션 코드, 런타임, 라이브러리, 설정 파일 등이 포함되어 있으며, 여러 레이어로 구성되어 캐싱과 재사용이 가능합니다.
+
+3. **컨테이너 (Containers)**  
+   - **역할:**  
+     이미지를 실행한 인스턴스로, 실제 애플리케이션이 실행되는 단위입니다.
+   - **특징:**  
+     - 격리된 환경에서 동작하며, 각 컨테이너는 독립적인 파일 시스템, 네트워크 인터페이스, CPU/메모리를 가집니다.
+     
+4. **도커 아키텍처**  
+   - **주요 구성 요소:**  
+     - **Docker CLI / Desktop:** 사용자의 명령어 입력 인터페이스  
+     - **Docker REST API:** Docker 클라이언트와 데몬 간의 통신 수단  
+     - **Docker 데몬 (dockerd):** 컨테이너, 이미지, 네트워크, 볼륨 등의 관리  
+     - **Docker 레지스트리:** 도커 이미지 저장소 (예: Docker Hub)
+
+5. **도커 네트워크 & 볼륨**  
+   - **네트워크:**  
+     컨테이너 간 통신을 위한 드라이버 (bridge, host, overlay 등)
+   - **볼륨:**  
+     데이터를 영구 저장하기 위한 메커니즘으로, 컨테이너 삭제 후에도 데이터 보존이 가능하며, 데이터 공유에 유용합니다.
+
+6. **Docker Compose**  
+   - **기능:**  
+     다중 컨테이너 애플리케이션을 정의하고 실행하기 위한 도구입니다.
+   - **주요 명령어:**  
+     `docker-compose up`, `docker-compose down`, `docker-compose ps`, `docker-compose logs` 등으로 관리합니다.
+
+7. **실제 활용 사례**  
+   - **개발 환경 표준화:** "내 컴퓨터에서는 작동합니다" 문제 해결  
+   - **마이크로서비스 아키텍처:** 각 서비스를 독립적으로 배포, 확장  
+   - **CI/CD 파이프라인:** 자동화된 빌드, 테스트, 배포  
+   - **클라우드 네이티브:** Kubernetes 등과의 통합으로 확장성 및 이식성 확보
+
+---
+
 ## 요약
 
-- **Docker 설치:** Ubuntu에서 Docker를 설치하고, GPG 키 추가 및 저장소 설정, 그룹 추가 등을 통해 sudo 없이도 사용 가능하게 구성합니다.
-- **Node.js 설치:** nvm을 통해 최신 LTS 버전의 Node.js를 설치하며, 로컬 프로젝트와 함께 컨테이너화하는 과정을 포함합니다.
-- **Dockerfile 작성:** 다단계 빌드 방식을 적용해, 의존성 설치와 실행 단계를 분리하여 효율적인 이미지를 빌드합니다.
-- **Docker Compose:** 다중 컨테이너 애플리케이션(예: Node.js 웹 앱 + MongoDB)을 관리할 수 있는 docker-compose.yml 파일 예제와 주요 명령어를 소개합니다.
-
-이와 같이 구성된 가이드를 통해 Docker 및 Node.js 기반 애플리케이션 구축에 대해 보다 자세히 학습하고, 실제 환경에서도 적용할 수 있을 것입니다. 추가적인 설명이나 특정 환경에 맞는 조정 사항은 실제 사용 시 환경에 맞게 수정하시기 바랍니다.
+- **Docker 설치:** Ubuntu에서 Docker Engine, CLI, containerd를 설치하고, GPG 키 및 저장소 설정, 사용자 그룹 추가 등을 통해 sudo 없이 사용 가능하게 구성합니다.
+- **Docker Compose 설치:** GitHub 릴리즈를 통해 설치 후 실행 권한 부여를 통해 다중 컨테이너 애플리케이션 관리가 용이합니다.
+- **Node.js 사용법:** nvm을 통해 최신 LTS 버전의 Node.js를 설치하거나, 공식 Node.js 이미지를 사용해 Docker 컨테이너를 통해 애플리케이션을 실행합니다.
+- **Docker 이미지:** 도커 이미지는 컨테이너 생성을 위한 템플릿이며, Dockerfile로 빌드됩니다.
+- **Docker Compose 관련 명령어:** `up`, `ps`, `logs`, `exec`, `stop`, `down`, `build`, `--scale` 등으로 컨테이너 환경을 효율적으로 관리할 수 있습니다.
+- **도커 기본 개념 및 활용:** 도커의 컨테이너화, 격리, 이미지, 네트워크, 볼륨 등 기본 개념과 실제 활용 사례를 통해 애플리케이션의 이식성, 효율성, 표준화를 달성합니다.
 
 ---
