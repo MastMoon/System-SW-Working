@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 이미지 생성 가이드</title>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        
+        .slide-container {
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            padding: 3rem;
+            display: none;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        h1, h2 {
+            color: #0DB7ED;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.4em;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #0DB7ED;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            border-bottom: 2px solid #0DB7ED;
+            color: #066DA5;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        code, pre {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        code {
+            padding: 2px 5px;
+            color: #c7254e;
+        }
+        
+        pre {
+            padding: 15px;
+            overflow-x: auto;
+            border-left: 4px solid #0DB7ED;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #0DB7ED;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .docker-blue {
+            color: #0DB7ED;
+        }
+        
+        .docker-icon {
+            display: block;
+            margin: 0 auto 30px;
+            width: 150px;
+            height: auto;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .command {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .terminal {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .terminal:before {
+            content: "$ ";
+            color: #98c379;
+        }
+        
+        /* 네비게이션 스타일 */
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .nav-button {
+            background-color: #0DB7ED;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-button:hover {
+            background-color: #066DA5;
+        }
+        
+        .nav-button:disabled {
+            background-color: rgba(13, 183, 237, 0.5);
+            cursor: not-allowed;
+        }
+        
+        .slide-number {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: #666;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            color: #066DA5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- 슬라이드 1: Docker 이미지란? -->
+        <div class="slide active" id="slide1">
+            <div class="page-number">1</div>
+            <header>
+                <svg class="docker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                    <path fill="#0DB7ED" d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/>
+                </svg>
+                <h1>Docker 이미지 생성 가이드</h1>
+                <p style="text-align: center; font-size: 1.2em;">효율적인 컨테이너 이미지 구축하기</p>
+            </header>
+
+            <div class="section">
+                <h2>1. Docker 이미지란?</h2>
+                <ul>
+                    <li>컨테이너를 실행하기 위한 독립적인 패키지</li>
+                    <li>애플리케이션 실행에 필요한 모든 요소 포함
+                        <ul>
+                            <li>코드, 런타임, 시스템 도구, 라이브러리, 설정</li>
+                        </ul>
+                    </li>
+                    <li>불변성(Immutability) 보장</li>
+                    <li>계층화된 파일 시스템 구조</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 슬라이드 2: Dockerfile 기본 구조 -->
+        <div class="slide" id="slide2">
+            <div class="page-number">2</div>
+            <h2>2. Dockerfile 기본 구조</h2>
+            <div class="section">
+                <pre><code># 베이스 이미지 선택
+FROM ubuntu:22.04
+
+# 메타데이터 추가
+LABEL maintainer="team@example.com"
+
+# 환경 변수 설정
+ENV APP_HOME=/app
+
+# 명령어 실행
+RUN apt-get update && apt-get install -y nginx
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 파일 복사
+COPY . .
+
+# 포트 노출
+EXPOSE 80
+
+# 실행 명령
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+            </div>
+        </div>
+
+        <!-- 슬라이드 3: 주요 Dockerfile 명령어 -->
+        <div class="slide" id="slide3">
+            <div class="page-number">3</div>
+            <h2>3. 주요 Dockerfile 명령어</h2>
+            <div class="section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>명령어</th>
+                            <th>설명</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>FROM</code></td>
+                            <td>베이스 이미지 지정</td>
+                        </tr>
+                        <tr>
+                            <td><code>LABEL</code></td>
+                            <td>메타데이터 추가</td>
+                        </tr>
+                        <tr>
+                            <td><code>ENV</code></td>
+                            <td>환경 변수 설정</td>
+                        </tr>
+                        <tr>
+                            <td><code>RUN</code></td>
+                            <td>빌드 시 명령어 실행</td>
+                        </tr>
+                        <tr>
+                            <td><code>WORKDIR</code></td>
+                            <td>작업 디렉토리 설정</td>
+                        </tr>
+                        <tr>
+                            <td><code>COPY/ADD</code></td>
+                            <td>파일/디렉토리 복사</td>
+                        </tr>
+                        <tr>
+                            <td><code>VOLUME</code></td>
+                            <td>볼륨 마운트 포인트 설정</td>
+                        </tr>
+                        <tr>
+                            <td><code>EXPOSE</code></td>
+                            <td>컨테이너가 사용할 포트 지정</td>
+                        </tr>
+                        <tr>
+                            <td><code>CMD</code></td>
+                            <td>컨테이너 실행 시 기본 명령어</td>
+                        </tr>
+                        <tr>
+                            <td><code>ENTRYPOINT</code></td>
+                            <td>컨테이너 실행 시 항상 실행되는 명령어</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 슬라이드 4: 이미지 빌드 및 관리 -->
+        <div class="slide" id="slide4">
+            <div class="page-number">4</div>
+            <h2>4. 이미지 빌드 및 관리</h2>
+            <div class="section">
+                <h3>이미지 빌드</h3>
+                <div class="terminal">
+                    <pre># 기본 빌드
+docker build -t my-app:1.0 .
+
+# 캐시 무시하고 빌드
+docker build --no-cache -t my-app:1.0 .
+
+# 특정 Dockerfile 지정
+docker build -f Dockerfile.prod -t my-app:prod .</pre>
+                </div>
+
+                <h3>이미지 관리</h3>
+                <div class="terminal">
+                    <pre># 이미지 목록 확인
+docker images
+
+# 태그 추가
+docker tag my-app:1.0 registry.example.com/my-app:1.0
+
+# 이미지 삭제
+docker rmi my-app:1.0
+
+# 레지스트리에 푸시
+docker push registry.example.com/my-app:1.0</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 슬라이드 5: 실전 예제: Node.js 애플리케이션 -->
+        <div class="slide" id="slide5">
+            <div class="page-number">5</div>
+            <h2>5. 실전 예제: Node.js 애플리케이션</h2>
+            <div class="section">
+                <pre><code>FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]</code></pre>
+
+                <h3>빌드 및 실행</h3>
+                <div class="terminal">
+                    <pre>docker build -t node-app:1.0 .
+docker run -p 3000:3000 node-app:1.0</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 슬라이드 6: 멀티스테이지 빌드 -->
+        <div class="slide" id="slide6">
+            <div class="page-number">6</div>
+            <h2>6. 멀티스테이지 빌드</h2>
+            <div class="section">
+                <pre><code># 빌드 스테이지
+FROM node:18 AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# 실행 스테이지
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]</code></pre>
+
+                <h3>장점</h3>
+                <ul>
+                    <li>이미지 크기 대폭 축소</li>
+                    <li>보안 취약점 감소</li>
+                    <li>빌드 도구 제외</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 슬라이드 7: 베스트 프랙티스 -->
+        <div class="slide" id="slide7">
+            <div class="page-number">7</div>
+            <h2>7. 베스트 프랙티스</h2>
+            <div class="section">
+                <ul>
+                    <li><code>.dockerignore</code> 파일 사용하기</li>
+                    <li>최소 베이스 이미지 선택 (alpine, slim 등)</li>
+                    <li>레이어 수 최소화 (RUN 명령어 체인)</li>
+                    <li>캐시 최적화 (자주 변경되는 파일 나중에 복사)</li>
+                    <li>비루트 사용자로 실행</li>
+                    <li>의존성 버전 명시적 지정</li>
+                    <li>환경별 Dockerfile 분리 (개발/테스트/프로덕션)</li>
+                </ul>
+                
+                <div class="highlight">
+                    <h3>핵심 요약</h3>
+                    <ol>
+                        <li>Dockerfile로 이미지 정의</li>
+                        <li>계층화된 구조 이해하기</li>
+                        <li>멀티스테이지 빌드로 최적화</li>
+                        <li>베스트 프랙티스 적용하기</li>
+                    </ol>
+                </div>
+
+                <footer style="text-align: center; margin-top: 50px; color: #666;">
+                    <p>감사합니다!</p>
+                </footer>
+            </div>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="navigation">
+            <button class="nav-button" id="prevBtn">◀</button>
+            <button class="nav-button" id="nextBtn">▶</button>
+        </div>
+        <div class="slide-number" id="slideNumber">1 / 7</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideNumber = document.getElementById('slideNumber');
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[index].classList.add('active');
+                slideNumber.textContent = `${index + 1} / ${slides.length}`;
+                
+                // 첫 번째 슬라이드에서는 이전 버튼 비활성화
+                if (index === 0) {
+                    prevBtn.disabled = true;
+                    prevBtn.style.opacity = '0.5';
+                    prevBtn.style.cursor = 'default';
+                } else {
+                    prevBtn.disabled = false;
+                    prevBtn.style.opacity = '1';
+                    prevBtn.style.cursor = 'pointer';
+                }
+                
+                // 마지막 슬라이드에서는 다음 버튼 비활성화
+                if (index === slides.length - 1) {
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.5';
+                    nextBtn.style.cursor = 'default';
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                    nextBtn.style.cursor = 'pointer';
+                }
+                
+                // 페이지 상단으로 스크롤
+                window.scrollTo(0, 0);
+            }
+
+            prevBtn.addEventListener('click', function() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+
+            nextBtn.addEventListener('click', function() {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            // 키보드 화살표 키로 슬라이드 이동
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                } else if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            // 초기 슬라이드 표시
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>

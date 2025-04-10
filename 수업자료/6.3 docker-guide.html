@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 설치 및 활용 가이드</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #0066cc;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #0088cc;
+            margin-top: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .note {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 10px 15px;
+            margin: 20px 0;
+        }
+        .command {
+            font-weight: bold;
+            color: #d14;
+        }
+    </style>
+</head>
+<body>
+    <h1>Docker 설치 및 활용 가이드</h1>
+    
+    <h2>1. 개요</h2>
+    <p><strong>Docker(도커)</strong>는 2013년 3월 Docker, Inc에서 출시한 오픈 소스 컨테이너 프로젝트입니다. 현재 전세계적으로 큰 인기를 끌고 있으며 AWS, Google Cloud Platform, Microsoft Azure 등의 클라우드 서비스에서 공식 지원됩니다.</p>
+    
+    <h3>주요 기능</h3>
+    <ul>
+        <li>Docker 이미지 생성</li>
+        <li>컨테이너 동작</li>
+        <li>Docker 이미지 공개 및 공유</li>
+    </ul>
+    
+    <h3>정보</h3>
+    <table>
+        <tr>
+            <td><strong>대분류</strong></td>
+            <td>미들웨어</td>
+            <td><strong>소분류</strong></td>
+            <td>클라우드 서비스</td>
+        </tr>
+        <tr>
+            <td><strong>라이선스 형태</strong></td>
+            <td>아파치 라이선스 2.0</td>
+            <td><strong>사전설치 솔루션</strong></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><strong>실행 운영체제</strong></td>
+            <td>Windows, Linux</td>
+            <td><strong>버전</strong></td>
+            <td>18.05.0-ce / 2018년 5월 9일</td>
+        </tr>
+    </table>
+    
+    <h3>특징</h3>
+    <ul>
+        <li>Docker는 반가상화보다 경량화 방식이며 이미지 용량이 작습니다.</li>
+        <li>게스트 OS가 없고 Docker 이미지에 Application과 Library만 격리해서 OS 자원을 호스트와 공유합니다.</li>
+        <li>하드웨어 가상화 계층이 없기 때문에 메모리 접근, 파일시스템이 가상머신에 비해 월등히 빠릅니다.</li>
+        <li>가상 머신과 다르게 이미지 생성/배포에 특화된 이미지 버전 관리 기능을 제공합니다.</li>
+        <li>중앙 관리를 위해 저장소에 이미지를 올리고, 받을 수 있습니다(Push/Pull).</li>
+        <li>GitHub처럼 Docker 이미지를 공유할 수 있는 Docker Hub를 제공합니다.</li>
+    </ul>
+    
+    <h3>보안취약점</h3>
+    <ul>
+        <li><strong>취약점 ID:</strong> CVE-2014-5282</li>
+        <li><strong>심각도:</strong> 8.1 HIGH(V3)</li>
+        <li><strong>취약점 설명:</strong> 1.3 이전의 Docker는 이미지 ID의 유효성을 제대로 검사하지 못하기 때문에 원격 공격자가 '도커로드'를 통해 신뢰할 수 없는 이미지를 로드하여 다른 이미지로 리디렉션할 수 있습니다.</li>
+        <li><strong>대응방안:</strong> Docker 엔진 1.3으로 업데이트</li>
+        <li><strong>참고 경로:</strong> <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1168436">https://bugzilla.redhat.com/show_bug.cgi?id=1168436</a></li>
+    </ul>
+    
+    <h2>2. 기능요약</h2>
+    <h3>Docker의 주요 기능</h3>
+    
+    <table>
+        <tr>
+            <th>기능</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td><strong>운영 표준화</strong></td>
+            <td>작은 컨테이너식 애플리케이션을 사용하면 손쉽게 배포하고, 문제를 파악하고, 수정을 위해 롤백할 수 있습니다.</td>
+        </tr>
+        <tr>
+            <td><strong>지속적인 통합 및 제공</strong></td>
+            <td>환경을 표준화하고 언어 스택 및 버전 간의 충돌을 제거함으로써 애플리케이션을 더욱 빠르게 제공합니다.</td>
+        </tr>
+        <tr>
+            <td><strong>마이크로 서비스</strong></td>
+            <td>Docker 컨테이너를 통해 표준화된 코드 배포를 활용하여 분산 애플리케이션 아키텍처를 구축하고 확장할 수 있습니다.</td>
+        </tr>
+    </table>
+    
+    <h2>3. 실행환경</h2>
+    <h3>설치 가능한 운영체제</h3>
+    
+    <table>
+        <tr>
+            <th>구분</th>
+            <th>버전</th>
+            <th>하드웨어 아키텍처</th>
+        </tr>
+        <tr>
+            <td>Windows</td>
+            <td>Windows 10 64bit: Pro, Enterprise or Education (1607 Anniversary Update, Build 14393 or later)</td>
+            <td>x86_64</td>
+        </tr>
+        <tr>
+            <td>MacOS</td>
+            <td>El Capitan 10.11 이상</td>
+            <td>2010년도 모델 또는 신모델</td>
+        </tr>
+        <tr>
+            <td>Fedora</td>
+            <td>26, 27, 28</td>
+            <td>x86_64(또는 amd64)</td>
+        </tr>
+        <tr>
+            <td>CentOS</td>
+            <td>7</td>
+            <td>x86_64(또는 amd64)</td>
+        </tr>
+        <tr>
+            <td>Debian</td>
+            <td>Buster 10 (Docker CE 17.11 Edge only)<br>
+                Stretch 9 (stable) / Raspbian Stretch<br>
+                Jessie 8 (LTS) / Raspbian Jessie<br>
+                Wheezy 7.7 (LTS)</td>
+            <td>x86_64(또는 amd64), armhf</td>
+        </tr>
+        <tr>
+            <td>Ubuntu</td>
+            <td>Bionic 18.04 (LTS)<br>
+                Xenial 16.04 (LTS)<br>
+                Trusty 14.04 (LTS)</td>
+            <td>x86_64, armhf, s390x (IBM Z), ppc64le (IBM Power)</td>
+        </tr>
+    </table>
+    
+    <h2>4. 설치 및 실행</h2>
+    
+    <h3>4.1 설치 진행 (CentOS)</h3>
+    
+    <h4>1) yum을 사용하여 패키지 설치</h4>
+    <pre><code>$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2</code></pre>
+    
+    <h4>2) 레포지토리 추가</h4>
+    <pre><code>$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</code></pre>
+    
+    <h4>3) Docker-ce 설치</h4>
+    <pre><code>$ sudo yum install docker-ce</code></pre>
+    
+    <h4>4) Docker 버전 확인</h4>
+    <pre><code>$ docker version</code></pre>
+    
+    <h3>4.1 설치 진행 (Ubuntu)</h3>
+    
+    <h4>1) 레포지토리를 이용한 설치 방법</h4>
+    <pre><code>$ apt-get update</code></pre>
+    
+    <h4>2) Apt를 통해서 패키지 설치</h4>
+    <pre><code>$ sudo apt-get install apt-transport-https ca-certificates curl software-properties-common</code></pre>
+    
+    <h4>3) Docker 공식 GPG Key 추가</h4>
+    <pre><code>$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</code></pre>
+    
+    <h4>4) Apt-get fingerprint key 확인</h4>
+    <pre><code>$ sudo apt-key fingerprint 0EBFCD88</code></pre>
+    
+    <h4>5) 레포지토리 추가</h4>
+    <pre><code>$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"</code></pre>
+    
+    <h4>6) Docker-ce 설치</h4>
+    <pre><code>$ sudo apt-get install docker-ce</code></pre>
+    
+    <h4>7) Docker 버전 확인</h4>
+    <pre><code>$ docker version</code></pre>
+    
+    <h3>4.1 설치 진행 (Windows)</h3>
+    
+    <h4>1) Docker store 접속하여 설치 패키지 다운로드</h4>
+    <p><a href="https://store.docker.com/editions/community/docker-ce-desktop-windows">https://store.docker.com/editions/community/docker-ce-desktop-windows</a></p>
+    
+    <h4>2) Docker for Windows Installer.exe 실행하여 설치 진행</h4>
+    
+    <h4>3) 설치가 끝나면 Close and log out 클릭하여 Windows 로그아웃 진행</h4>
+    
+    <h4>4) Windows 검색에서 Docker 찾아 실행 (Windows Hyper-V 사용하고 있지 않았다면 Ok 버튼 클릭)</h4>
+    
+    <h4>5) Windows PowerShell에서 Docker 버전 확인</h4>
+    <pre><code>$ docker version</code></pre>
+    
+    <h2>5. 기능소개</h2>
+    
+    <h3>5.1 컨테이너 실행 (run)</h3>
+    <p>Docker 컨테이너를 생성하는 명령어:</p>
+    <pre><code>docker run &lt;옵션&gt; &lt;이미지 이름, ID&gt; &lt;명령&gt; &lt;매개 변수&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-a, --attach=[]</td>
+            <td>표준 입력(stdin), 표준 출력(stdout), 표준 에러(stderr) 연결</td>
+        </tr>
+        <tr>
+            <td>--add-host=[]</td>
+            <td>컨테이너의 /etc/hosts에 호스트 이름과 IP 주소 추가</td>
+        </tr>
+        <tr>
+            <td>-c, --cpu-shares=0</td>
+            <td>CPU 자원 분배 설정, 설정의 기본 값은 1024</td>
+        </tr>
+        <tr>
+            <td>--cap-add=[]</td>
+            <td>cgroups의 특정 Capability 사용</td>
+        </tr>
+        <tr>
+            <td>--cap-drop=[]</td>
+            <td>컨테이너에서 cgroups의 특정 Capability 제외</td>
+        </tr>
+        <tr>
+            <td>--cidfile=""</td>
+            <td>멀티코어 CPU에서 실행될 코어 설정</td>
+        </tr>
+        <tr>
+            <td>-d, --detach=false</td>
+            <td>Detached 모드</td>
+        </tr>
+        <tr>
+            <td>--device=[]</td>
+            <td>호스트의 장치를 사용할 수 있도록 연결</td>
+        </tr>
+        <tr>
+            <td>--dns=[]</td>
+            <td>DNS 서버 설정</td>
+        </tr>
+        <tr>
+            <td>--dns-search=[]</td>
+            <td>DNS 검색 도메인 설정</td>
+        </tr>
+        <tr>
+            <td>-e, --env=[]</td>
+            <td>환경 변수 설정</td>
+        </tr>
+        <tr>
+            <td>--entrypoint=""</td>
+            <td>Dockerfile의 ENTRYPOINT를 무시하고 다른 값 설정</td>
+        </tr>
+        <tr>
+            <td>--env-file=[]</td>
+            <td>환경 변수가 설정된 파일 적용</td>
+        </tr>
+        <tr>
+            <td>--expose=[]</td>
+            <td>포트를 호스트와 연결</td>
+        </tr>
+        <tr>
+            <td>-h, --hostname=""</td>
+            <td>호스트 이름 설정</td>
+        </tr>
+        <tr>
+            <td>-i, --interactive=false</td>
+            <td>표준 입력(stdin) 활성화, 컨테이너 표준 입력 유지</td>
+        </tr>
+        <tr>
+            <td>--link=[]</td>
+            <td>컨테이너간 연결</td>
+        </tr>
+        <tr>
+            <td>--lxc-conf=[]</td>
+            <td>LXC 옵션</td>
+        </tr>
+        <tr>
+            <td>-m, --memory=""</td>
+            <td>메모리 한계 설정</td>
+        </tr>
+        <tr>
+            <td>--name=""</td>
+            <td>컨테이너 이름 설정</td>
+        </tr>
+        <tr>
+            <td>--net=""</td>
+            <td>네트워크 모드 설정</td>
+        </tr>
+        <tr>
+            <td>-P, --publish-all=false</td>
+            <td>호스트에 연결된 컨테이너 포트 외부노출</td>
+        </tr>
+        <tr>
+            <td>-p, --publish=[]</td>
+            <td>호스트에 연결된 컨테이너 특정 포트 외부노출</td>
+        </tr>
+        <tr>
+            <td>--privileged=false</td>
+            <td>컨테이너에서 호스트의 리눅스 커널 기능 사용</td>
+        </tr>
+        <tr>
+            <td>--restart=""</td>
+            <td>컨테이너 프로세스 종료 시 재시작 정책 설정</td>
+        </tr>
+        <tr>
+            <td>--rm=false</td>
+            <td>프로세스 종료되면 컨테이너 자동삭제</td>
+        </tr>
+        <tr>
+            <td>--security-opt=[]</td>
+            <td>SELinux, AppArmor 옵션 설정</td>
+        </tr>
+        <tr>
+            <td>--sig-proxy=true</td>
+            <td>모든 시그널 프로세스에 전달</td>
+        </tr>
+        <tr>
+            <td>-t, --tty=false</td>
+            <td>TTY 모드(pseudo-TTY) 사용</td>
+        </tr>
+        <tr>
+            <td>-u, --user=""</td>
+            <td>리눅스 사용자 계정 이름/UID 설정</td>
+        </tr>
+        <tr>
+            <td>-v, --volume=[]</td>
+            <td>데이터 볼륨 설정</td>
+        </tr>
+        <tr>
+            <td>--volumes-from=[]</td>
+            <td>데이터 볼륨 컨테이너 연결</td>
+        </tr>
+        <tr>
+            <td>-w, --workdir=""</td>
+            <td>프로세스가 실행될 디렉터리 설정</td>
+        </tr>
+    </table>
+    
+    <h3>5.2 컨테이너 목록 확인하기 (ps)</h3>
+    <p>컨테이너 목록을 확인하는 명령어:</p>
+    <pre><code>docker ps &lt;옵션&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>a, --all=false</td>
+            <td>모든 컨테이너 출력</td>
+        </tr>
+        <tr>
+            <td>--before=""</td>
+            <td>특정 컨테이너가 생성되기 전에 생성된 컨테이너 출력, 정지된 컨테이너도 포함</td>
+        </tr>
+        <tr>
+            <td>-f, --filter=[]</td>
+            <td>출력 필터 설정 예) "exited=0"</td>
+        </tr>
+        <tr>
+            <td>-l, --latest=false</td>
+            <td>마지막에 생성된 컨테이너 출력 정지된 컨테이너도 포함</td>
+        </tr>
+        <tr>
+            <td>-n=-1</td>
+            <td>최근에 생성된 컨테이너 일정 개수만 출력 정지된 컨테이너도 포함</td>
+        </tr>
+        <tr>
+            <td>--no-trunc=false</td>
+            <td>생략된 부분 모두 출력</td>
+        </tr>
+        <tr>
+            <td>-q, --quiet=false</td>
+            <td>컨테이너 ID만 출력</td>
+        </tr>
+    </table>
+    
+    <h3>5.3 컨테이너 중지하기 (stop)</h3>
+    <p>실행중인 컨테이너를 중지하는 명령어:</p>
+    <pre><code>docker stop &lt;옵션&gt; CONTAINER [CONTAINER...]</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-t, –time=10</td>
+            <td>컨테이너 정지하기 전 대기하는 시간 설정 (초 단위)</td>
+        </tr>
+    </table>
+    
+    <h3>5.4 컨테이너 제거하기 (rm)</h3>
+    <p>컨테이너를 제거하는 명령어:</p>
+    <pre><code>docker rm &lt;옵션&gt; &lt;컨테이너 이름, ID&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-f, --force=false</td>
+            <td>컨테이너를 강제로 정지한 뒤 삭제(SIGKILL 시그널 사용)</td>
+        </tr>
+        <tr>
+            <td>-l, --link=false</td>
+            <td>docker run 명령의 --link 옵션을 사용하여 연결된 링크만 삭제</td>
+        </tr>
+        <tr>
+            <td>-v, --volumes=false</td>
+            <td>컨테이너에 연결된 데이터 볼륨 삭제</td>
+        </tr>
+    </table>
+    
+    <h3>5.5 이미지 목록 확인하기 (images)</h3>
+    <p>도커 이미지 목록을 출력하는 명령어:</p>
+    <pre><code>docker images &lt;옵션&gt; &lt;이미지 이름&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-a, --all=false</td>
+            <td>상속 이미지까지 모두 표시</td>
+        </tr>
+        <tr>
+            <td>-f, --filter=[]</td>
+            <td>출력 결과 필터 설정 ("dangling=true" 이름이 없는 이미지만 출력)</td>
+        </tr>
+        <tr>
+            <td>--no-trunc=false</td>
+            <td>생략된 부분 모두 출력</td>
+        </tr>
+        <tr>
+            <td>-q, --quiet=false</td>
+            <td>이미지 ID만 출력</td>
+        </tr>
+    </table>
+    
+    <h3>5.6 이미지 다운로드하기 (pull)</h3>
+    <p>Docker 레지스트리에서 이미지를 받아오는 명령어:</p>
+    <pre><code>docker pull &lt;옵션&gt; &lt;저장소 이름&gt;/&lt;이미지 이름&gt;:&lt;태그&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-a, --all=false</td>
+            <td>이미지의 모든 태그 받음</td>
+        </tr>
+    </table>
+    
+    <h3>5.7 이미지 삭제하기 (rmi)</h3>
+    <p>이미지를 삭제하는 명령어, 만약 태그를 지정하지 않으면 latest 태그를 삭제합니다:</p>
+    <pre><code>docker rmi &lt;저장소 이름&gt;/&lt;이미지 이름, ID&gt;:&lt;태그&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-f, --force=false</td>
+            <td>이미지를 강제로 삭제</td>
+        </tr>
+        <tr>
+            <td>--no-prune=false</td>
+            <td>태그가 없는 상속 이미지를 삭제하지 않음</td>
+        </tr>
+    </table>
+    
+    <h3>5.8 컨테이너 로그 보기(logs)</h3>
+    <p>컨테이너의 로그를 출력하는 명령어:</p>
+    <pre><code>docker logs &lt;컨테이너 이름, ID&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-f, --follow=false</td>
+            <td>로그를 실시간으로 출력</td>
+        </tr>
+        <tr>
+            <td>-t, --timestamps=false</td>
+            <td>로그 앞에 시간 값 표시</td>
+        </tr>
+        <tr>
+            <td>--tail="all"</td>
+            <td>숫자를 지정하여 최종 로그에서 일정 개수만 출력</td>
+        </tr>
+    </table>
+    
+    <h3>5.9 컨테이너에서 명령어 실행(exec)</h3>
+    <p>외부에서 컨테이너 안의 명령을 실행하는 명령어:</p>
+    <pre><code>docker exec &lt;옵션&gt; &lt;컨테이너 이름, ID&gt; &lt;명령&gt; &lt;매개 변수&gt;</code></pre>
+    
+    <p><strong>주요 옵션:</strong></p>
+    <table>
+        <tr>
+            <th>옵션</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>-d, --detach=false</td>
+            <td>명령을 백그라운드로 실행</td>
+        </tr>
+        <tr>
+            <td>-i, --interactive=false</td>
+            <td>표준 입력(stdin)을 활성화하며 컨테이너와 연결(attach)되어 있지 않더라도 표준 입력을 유지</td>
+        </tr>
+        <tr>
+            <td>-t, --tty=false</td>
+            <td>TTY 모드(pseudo-TTY) 사용 (Bash 사용시 필요, 명령 입력은 가능하지만 쉘이 표시되지 않음)</td>
+        </tr>
+    </table>
+    
+    <h2>6. 활용예제</h2>
+    <h3>6.1 Nginx docker container 서비스</h3>
+    
+    <p>Docker를 이용하여 Nginx
