@@ -2,6 +2,114 @@
 
 ---
 
+# 리눅스 명령어 정리
+
+## 목차
+
+1. [디렉터리 및 파일 목록 확인: `ls`](#1-디렉터리-및-파일-목록-확인-ls)
+2. [디렉터리 이동: `cd`](#2-디렉터리-이동-cd)
+3. [파일 및 디렉터리 삭제: `rm`, `rmdir`](#3-파일-및-디렉터리-삭제-rm-rmdir)
+4. [파일 복사: `cp`](#4-파일-복사-cp)
+5. [파일 이동 및 이름 변경: `mv`](#5-파일-이동-및-이름-변경-mv)
+6. [파일 내용 출력: `cat`, `head`, `tail`, `more`, `less`](#6-파일-내용-출력-cat-head-tail-more-less)
+7. [파일 정보 확인: `file`](#7-파일-정보-확인-file)
+8. [화면 정리: `clear`](#8-화면-정리-clear)
+
+---
+
+## 1. 디렉터리 및 파일 목록 확인: `ls`
+
+```bash
+ls                            # 현재 디렉터리의 파일 목록을 표시
+ls /etc/sysconfig /etc/sysconfig
+                              # 해당 디렉터리들의 목록을 표시
+ls -a                         # 현재 디렉터리의 숨김 파일 포함 목록을 표시
+ls -l                         # 현재 디렉터리의 목록을 자세히 표시
+ls *.cfg                      # 확장자가 .cfg인 파일 목록을 표시
+ls -l /etc/sysconfig/a*       # /etc/sysconfig 내에서 이름이 'a'로 시작하는 파일들을 자세히 표시
+```
+
+---
+
+## 2. 디렉터리 이동: `cd`
+
+```bash
+cd                            # 현재 사용자의 홈 디렉터리로 이동
+cd ~rocky rocky               # rocky 사용자의 홈 디렉터리로 이동
+cd ..                         # 상위 디렉터리로 이동 ('.'은 현재 디렉터리, '..'은 부모 디렉터리)
+cd /etc/sysconfig             # 절대 경로로 이동
+cd ../etc/sysconfig           # 상대 경로로 상위 → etc/sysconfig 디렉터리로 이동
+```
+
+---
+
+## 3. 파일 및 디렉터리 삭제: `rm`, `rmdir`
+
+```bash
+rm abc.txt                   # abc.txt 파일 삭제
+rm -i abc.txt                # 삭제 전에 확인 메시지 출력
+rm -f abc.txt                # 강제 삭제 (확인 없음)
+rm -r abc                    # 디렉터리 abc를 재귀적으로 삭제
+rm -rf abc                   # 디렉터리 및 하위 내용 전체 강제 삭제 (⚠️ 위험)
+rmdir abc                    # 빈 디렉터리 abc 삭제
+```
+
+---
+
+## 4. 파일 복사: `cp`
+
+```bash
+cp abc.txt cba.txt           # abc.txt → cba.txt로 이름 바꾸어 복사
+cp -r abc cda                # 디렉터리 abc를 cda로 복사
+```
+
+---
+
+## 5. 파일 이동 및 이름 변경: `mv`
+
+```bash
+mv abc.txt /etc/sysconfig/   # abc.txt 파일을 해당 디렉터리로 이동
+mv aaa bbb ccc ddd           # aaa, bbb, ccc 파일을 ddd 디렉터리로 이동
+mv abc.txt www.txt           # abc.txt 이름을 www.txt로 변경
+```
+
+---
+
+## 6. 파일 내용 출력: `cat`, `head`, `tail`, `more`, `less`
+
+```bash
+cat a.txt                    # a.txt 파일 전체 내용 출력
+
+head anaconda-ks.cfg         # 앞 10줄 출력
+head -3 anaconda-ks.cfg      # 앞 3줄만 출력
+tail -5 anaconda-ks.cfg      # 마지막 5줄 출력
+
+more anaconda-ks.cfg         # 페이지 단위 출력
+more +30 anaconda-ks.cfg     # 30번째 줄부터 출력
+
+less anaconda-ks.cfg         # 상하 스크롤 가능한 보기
+less +30 anaconda-ks.cfg     # 30번째 줄부터 출력
+```
+
+---
+
+## 7. 파일 정보 확인: `file`
+
+```bash
+file anaconda-ks.cfg        # ASCII 텍스트 파일인지 확인
+file /dev/sr0               # sr0가 DVD 장치로 block special 파일인지 확인
+```
+
+---
+
+## 8. 화면 정리: `clear`
+
+```bash
+clear                       # 터미널 화면 전체 초기화
+```
+
+---
+
 ## 목차
 - [Shebang (쉘 인터프리터 지정)](#shebang-쉘-인터프리터-지정)
 - [BASH SHELL PROGRAMMING](#bash-shell-programming)
@@ -33,20 +141,21 @@
 - [THE UNTIL LOOP](#the-until-loop)
 - [EXAMPLE: USING THE UNTIL LOOP](#example-using-the-until-loop)
 - [THE FOR LOOP](#the-for-loop)
-- [EXAMPLE 1: THE FOR LOOP](#example-1-the-for-loop)
-- [EXAMPLE 2: USING THE FOR LOOP](#example-2-using-the-for-loop)
+  - [EXAMPLE 1: THE FOR LOOP](#example-1-the-for-loop)
+  - [EXAMPLE 2: USING THE FOR LOOP](#example-2-using-the-for-loop)
 - [LOOPING OVER ARGUMENTS](#looping-over-arguments)
 - [SELECT COMMAND](#select-command)
 - [BREAK AND CONTINUE](#break-and-continue)
 - [SHELL FUNCTIONS](#shell-functions)
-- [EXAMPLE: 간단한 함수](#예제-간단한-함수)
-- [EXAMPLE: 반복 함수](#예제-반복-함수)
-- [함수 인자](#함수-인자)
-- [EXAMPLE: 매개변수가 있는 함수](#예제-매개변수가-있는-함수)
-- [EXAMPLE: 여러 인자 처리](#예제-여러-인자-처리)
-- [지역 변수 (local)](#지역-변수-local)
+  - [EXAMPLE: 간단한 함수](#예제-간단한-함수)
+  - [EXAMPLE: 반복 함수](#예제-반복-함수)
+  - [함수 인자](#함수-인자)
+    - [EXAMPLE: 매개변수가 있는 함수](#예제-매개변수가-있는-함수)
+    - [EXAMPLE: 여러 인자 처리](#예제-여러-인자-처리)
+  - [지역 변수 (local)](#지역-변수-local)
 
 ---
+
 
 ## Shebang (쉘 인터프리터 지정)
 
@@ -107,7 +216,7 @@ read -p "prompt" varname [more vars]
 
 ### USER INPUT EXAMPLE
 ```sh
-#! /bin/sh
+#! /bin/bash
 read -p "enter your name: " first last
 echo "First name: $first"
 echo "Last name: $last"
@@ -175,8 +284,8 @@ test expression
 
 ### Example:
 ```sh
-if test -w "$1"
-then
+#!/bin/bash
+if [ -w "$1" ]; then
     echo "file $1 is write-able"
 else
     echo "file $1 is not write-able or does not exist"
@@ -338,19 +447,19 @@ fi
 ```sh
 # DOUBLE SQUARE BRACKETS
 read -p "Do you want to continue? " reply
-if [[ $reply = "y" ]]; then
+if [[ "$reply" = "y" ]]; then
     echo "You entered $reply"
 fi
 
 # SINGLE SQUARE BRACKETS
 read -p "Do you want to continue? " reply
-if [ $reply = "y" ]; then
+if [ "$reply" = "y" ]; then
     echo "You entered $reply"
 fi
 
 # "TEST" COMMAND
 read -p "Do you want to continue? " reply
-if test $reply = "y"; then
+if test "$reply" = "y"; then
     echo "You entered $reply"
 fi
 ```
@@ -365,7 +474,9 @@ fi
 #!/bin/bash
 read -p "Enter Income Amount: " Income
 read -p "Enter Expenses Amount: " Expense
-let Net=$Income-$Expense
+# 변수 초기화 후 산술연산 (let 사용 시 공백 없이)
+let Net=Income-Expense
+
 if [ "$Net" -eq "0" ]; then
     echo "Income and Expenses are equal - breakeven."
 elif [ "$Net" -gt "0" ]; then
@@ -418,13 +529,18 @@ echo "Enter N to see all non-hidden files"
 echo "Enter Q to quit"
 read -p "Enter your choice: " reply
 
-case $reply in
-    Y|YES) echo "Displaying all (really…) files"
-           ls -a ;;
-    N|NO)  echo "Displaying all non-hidden files..."
-           ls ;;
-    Q)     exit 0 ;;
-    *)     echo "Invalid choice!"; exit 1 ;;
+case "$reply" in
+    Y|YES)
+        echo "Displaying all (really…) files"
+        ls -a ;;
+    N|NO)
+        echo "Displaying all non-hidden files..."
+        ls ;;
+    Q)
+        exit 0 ;;
+    *)
+        echo "Invalid choice!"
+        exit 1 ;;
 esac
 ```
 
@@ -489,13 +605,16 @@ SeniorRate=7
 
 read -p "Enter your age: " age
 
-case $age in
-    [1-9]|[1][0-2])   # 어린이 요금 (1~12세)
-        echo "Your rate is $""$ChildRate.00" ;;
-    [1][3-9]|[2-5][0-9]) # 성인 요금 (13~59세)
-        echo "Your rate is $""$AdultRate.00" ;;
-    [6-9][0-9])       # 노인 요금 (60세 이상)
-        echo "Your rate is $""$SeniorRate.00" ;;
+case "$age" in
+    [1-9]|1[0-2])
+        echo "Your rate is \$${ChildRate}.00" ;;
+    1[3-9]|[2-5][0-9])
+        echo "Your rate is \$${AdultRate}.00" ;;
+    [6-9][0-9])
+        echo "Your rate is \$${SeniorRate}.00" ;;
+    *)
+        echo "Invalid age input."
+        exit 1 ;;
 esac
 ```
 
@@ -592,10 +711,9 @@ done
 ```sh
 #!/bin/bash
 COUNTER=0
-while [ $COUNTER -lt 10 ]
-do
+while [ "$COUNTER" -lt 10 ]; do
     echo "The counter is $COUNTER"
-    let COUNTER=$COUNTER+1
+    let COUNTER=COUNTER+1
 done
 ```
 - `COUNTER` 값이 10 미만인 동안 증가하면서 출력.
@@ -607,10 +725,10 @@ done
 ```sh
 #!/bin/bash
 Cont="Y"
-while [ $Cont = "Y" ]; do
+while [ "$Cont" = "Y" ]; do
     ps -A
-    read -p "Want to continue? (Y/N)" reply
-    Cont=`echo $reply | tr [:lower:] [:upper:]`
+    read -p "Want to continue? (Y/N) " reply
+    Cont=$(echo "$reply" | tr '[:lower:]' '[:upper:]')
 done
 echo "Done"
 ```
@@ -623,20 +741,19 @@ echo "Done"
 ### 예제 3: 특정 디렉토리에 파일을 시간별로 이동
 ```sh
 #!/bin/bash
-# 홈 디렉토리에서 웹 서버 디렉토리로 파일을 복사하는 스크립트
-# 새로운 디렉토리를 매 시간 생성
-PICSDIR=/home/carol/pics
-WEBDIR=/var/www/carol/webcam
+PICSDIR="/home/carol/pics"
+WEBDIR="/var/www/carol/webcam"
+
 while true; do
-    DATE=`date +%Y%m%d`
-    HOUR=`date +%H`
-    mkdir $WEBDIR/"$DATE"
-    while [ $HOUR -ne "00" ]; do
-        DESTDIR=$WEBDIR/"$DATE"/"$HOUR"
-        mkdir "$DESTDIR"
-        mv $PICSDIR/*.jpg "$DESTDIR"/
+    DATE=$(date +%Y%m%d)
+    HOUR=$(date +%H)
+    mkdir -p "$WEBDIR/$DATE"
+    while [ "$HOUR" -ne "00" ]; do
+        DESTDIR="$WEBDIR/$DATE/$HOUR"
+        mkdir -p "$DESTDIR"
+        mv "$PICSDIR"/*.jpg "$DESTDIR"/
         sleep 3600
-        HOUR=`date +%H`
+        HOUR=$(date +%H)
     done
 done
 ```
@@ -670,9 +787,8 @@ done
 ```sh
 #!/bin/bash
 COUNTER=20
-until [ $COUNTER -lt 10 ]
-do
-    echo $COUNTER
+until [ "$COUNTER" -lt 10 ]; do
+    echo "$COUNTER"
     let COUNTER-=1
 done
 ```
@@ -685,10 +801,10 @@ done
 ```sh
 #!/bin/bash
 Stop="N"
-until [ $Stop = "Y" ]; do
+until [ "$Stop" = "Y" ]; do
     ps -A
-    read -p "Want to stop? (Y/N)" reply
-    Stop=`echo $reply | tr [:lower:] [:upper:]`
+    read -p "Want to stop? (Y/N) " reply
+    Stop=$(echo "$reply" | tr '[:lower:]' '[:upper:]')
 done
 echo "Done"
 ```
@@ -718,10 +834,10 @@ done
 
 ```sh
 #!/bin/bash
-for i in 7 9 2 3 4 5
-do
-    echo $i
+for i in 7 9 2 3 4 5; do
+    echo "$i"
 done
+
 ```
 - `7 9 2 3 4 5` 값들을 `i`에 할당하며 반복 실행.
 - 각 값이 차례로 출력됨.
@@ -732,13 +848,12 @@ done
 
 ```sh
 #!/bin/bash
-# Compute the average weekly temperature
-for num in 1 2 3 4 5 6 7
-do
+TempTotal=0
+for num in 1 2 3 4 5 6 7; do
     read -p "Enter temp for day $num: " Temp
-    let TempTotal=$TempTotal+$Temp
+    let TempTotal=TempTotal+Temp
 done
-let AvgTemp=$TempTotal/7
+let AvgTemp=TempTotal/7
 echo "Average temperature: $AvgTemp"
 ```
 - 사용자에게 7일간의 온도를 입력받아 합산.
@@ -753,9 +868,8 @@ echo "Average temperature: $AvgTemp"
 
 ```sh
 #!/bin/bash
-for parm
-do
-    echo $parm
+for parm; do
+    echo "$parm"
 done
 ```
 - 실행 시 전달된 인수들을 하나씩 출력함.
@@ -808,8 +922,7 @@ alpha
 ```sh
 #!/bin/bash
 PS3="select entry or ^D: "
-select var in alpha beta
-do
+select var in alpha beta; do
     echo "$REPLY = $var"
 done
 ```
@@ -819,13 +932,12 @@ done
 ### 실용 예제: 파일 보호 스크립트
 ```sh
 #!/bin/bash
-echo "script to make files private"
+echo "Script to make files private"
 echo "Select file to protect:"
-select FILENAME in *
-do
+select FILENAME in *; do
     echo "You picked $FILENAME ($REPLY)"
     chmod go-rwx "$FILENAME"
-    echo "it is now private"
+    echo "It is now private"
 done
 ```
 
@@ -863,14 +975,14 @@ echo "done"
 
 ### 예제: break & continue <mark> 중요! </mark>
 ```sh
-for index in 1 2 3 4 5 6 7 8 9 10
-do
-    if [ $index -le 3 ]; then
+#!/bin/bash
+for index in 1 2 3 4 5 6 7 8 9 10; do
+    if [ "$index" -le 3 ]; then
         echo "continue"
         continue
     fi
-    echo $index
-    if [ $index -ge 8 ]; then
+    echo "$index"
+    if [ "$index" -ge 8 ]; then
         echo "break"
         break
     fi
@@ -898,7 +1010,7 @@ function_name () {
 ### 예제: 간단한 함수
 ```sh
 #!/bin/bash
-funky () {
+funky() {
     echo "This is a funky function."
     echo "Now exiting funky function."
 }
@@ -910,15 +1022,14 @@ funky
 ### 예제: 반복 함수
 ```sh
 #!/bin/bash
-fun () {
-    JUST_A_SECOND=1
-    let i=0
-    REPEATS=30
+fun() {
+    local JUST_A_SECOND=1
+    local i=0
+    local REPEATS=30
     echo "And now the fun really begins."
-    while [ $i -lt $REPEATS ]
-    do
+    while [ "$i" -lt "$REPEATS" ]; do
         echo "-------FUNCTIONS are fun-------->"
-        sleep $JUST_A_SECOND
+        sleep "$JUST_A_SECOND"
         let i+=1
     done
 }
@@ -933,11 +1044,10 @@ fun
 
 ### 예제: 매개변수가 있는 함수
 ```sh
-#!/bin/sh
-#!/bin/bash # 이거를 적어야 밑에 bash 전용 문법이 에러 없이 잘 작동함.
+#!/bin/bash
 testfile() {
     if [ $# -gt 0 ]; then
-        if [[ -f $1 && -r $1 ]]; then //[[ ... ]]는 bash 전용 문법입니다.
+        if [[ -f "$1" && -r "$1" ]]; then  # [[ ... ]]는 bash 전용 문법입니다.
             echo "$1 is a readable file"
         else
             echo "$1 is not a readable file"
@@ -954,14 +1064,13 @@ testfile funtest
 ```sh
 #!/bin/bash
 checkfile() {
-    for file
-do
-    if [ -f "$file" ]; then
-        echo "$file is a file"
-    elif [ -d "$file" ]; then
-        echo "$file is a directory"
-    fi
-done
+    for file in "$@"; do
+        if [ -f "$file" ]; then
+            echo "$file is a file"
+        elif [ -d "$file" ]; then
+            echo "$file is a directory"
+        fi
+    done
 }
 checkfile . funtest
 ```
@@ -975,21 +1084,21 @@ checkfile . funtest
 ```sh
 #!/bin/bash
 global="pretty good variable"
-foo () {
+foo() {
     local inside="not so good variable"
-    echo $global
-    echo $inside
+    echo "$global"
+    echo "$inside"
     global="better variable"
 }
-echo $global
+echo "$global"
 foo
-echo $global
-echo $inside  # 출력되지 않음
+echo "$global"
+echo "$inside"  # 출력되지 않음 (local 변수이므로 범위 밖)
 ```
 
 ---
 
-# System-SW-Working - 가상화 (수정 날짜: 25.04.06)
+# System-SW-Working - 가상화 (수정 날짜: 25.04.09)
 
 이 문서는 가상화 기술의 기본 개념부터 구현 방식, 하이퍼바이저 분류, 오픈소스 프로젝트, 그리고 컨테이너 가상화까지 폭넓게 다룹니다.  
 
@@ -1011,6 +1120,22 @@ echo $inside  # 출력되지 않음
 - [8. Xen 가상화](#8-xen-가상화)
 - [9. KVM 가상화](#9-kvm-가상화)
 - [10. 컨테이너 가상화](#10-컨테이너-가상화)
+- [11. 개요 및 Docker 기본 개념](#11-개요-및-docker-기본-개념)
+  - [11.1 Docker란?](#111-docker란)
+  - [11.2 Docker 아키텍처](#112-docker-아키텍처)
+- [12. Docker 설치 가이드](#12-docker-설치-가이드)
+  - [12.1 Docker 설치 및 활용 가이드](#121-docker-설치-및-활용-가이드)
+- [13. Docker 이미지와 컨테이너 관리](#13-docker-이미지와-컨테이너-관리)
+  - [13.1 Docker 이미지 생성 및 Dockerfile](#131-docker-이미지-생성-및-dockerfile)
+  - [13.2 이미지 빌드 및 관리](#132-이미지-빌드-및-관리)
+  - [13.3 컨테이너 실행 및 관리](#133-컨테이너-실행-및-관리)
+- [14. Docker Desktop 및 Docker Compose](#14-docker-desktop-및-docker-compose)
+  - [14.1 Docker Desktop 사용 가이드](#141-docker-desktop-사용-가이드)
+  - [14.2 Docker Desktop 사용 방법](#142-docker-desktop-사용-방법)
+  - [14.3 Docker Compose 사용하기](#143-docker-compose-사용하기)
+- [15. Docker 주요 명령어 및 Best Practices](#15-docker-주요-명령어-및-best-practices)
+  - [15.1 기본 Docker 명령어](#151-기본-docker-명령어)
+  - [15.2 Best Practices](#152-best-practices)
 
 ---
 
@@ -1214,5 +1339,251 @@ KVM(Kernel-based Virtual Machine)은 리눅스 커널에 하이퍼바이저 기�
    ▼             ▼
 [각기 다른 OS] [각기 다른 OS]
 ```
+
+---
+
+# Docker Guide and Exam Study Notes
+
+## 11. 개요 및 Docker 기본 개념
+
+### 11.1 Docker란?
+- **Docker**는 애플리케이션 개발, 배포, 실행을 위한 오픈소스 컨테이너 플랫폼입니다.
+- **컨테이너화(Containerization):** 애플리케이션과 그 의존성(코드, 라이브러리, 설정 등)을 하나의 패키지로 묶어 격리된 환경에서 실행  
+- **이식성(Portability):** “내 컴퓨터에서는 동작하는데…” 문제를 해결  
+- **경량성(Efficiency):** 가상 머신보다 빠른 부팅과 적은 자원 사용
+
+### 11.2 Docker 아키텍처
+- **클라이언트-서버 모델:**
+  - **Docker Client:** 사용자가 명령어를 입력 (docker build, run 등)
+  - **Docker Daemon (dockerd):** 명령어 처리 및 컨테이너 관리
+  - **Docker Registry:** Docker 이미지 저장소 (예: Docker Hub)
+- **핵심 컴포넌트:**
+  - **이미지(Images):** 읽기 전용 템플릿으로, 애플리케이션 실행에 필요한 모든 요소 포함
+  - **컨테이너(Containers):** 이미지를 기반으로 실행되는 독립적 인스턴스
+  - **볼륨(Volumes):** 컨테이너 데이터의 영속성을 확보하기 위한 메커니즘
+  - **네트워크(Networks):** 컨테이너 간 통신을 위한 다양한 드라이버 (bridge, host, overlay, macvlan, none)
+
+---
+
+## 12. Docker 설치 가이드
+
+### 12.1 Docker 설치 및 활용 가이드
+#### 개요
+- Docker는 2013년 Docker, Inc에서 출시되었으며, AWS, Google Cloud, Microsoft Azure 등 주요 클라우드에서 공식 지원
+- 라이선스: Apache License 2.0
+
+#### 지원 운영체제 및 사양
+- **Windows:** Windows 10 (Pro, Enterprise, Education – 64bit, 최소 빌드 버전 요구)
+- **MacOS:** El Capitan 10.11 이상 (2010년도 모델 또는 신모델)
+- **Linux:** Fedora, CentOS, Debian, Ubuntu 등 각 배포판별 요구사항 존재
+
+#### 설치 예시
+
+**CentOS 설치 명령어:**
+```bash
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce
+docker version
+```
+
+**Ubuntu 설치 명령어:**
+```bash
+apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get install docker-ce
+docker version
+```
+
+**Windows 설치 개요:**
+- Docker Store에서 설치 패키지 다운로드 ([Docker Desktop for Windows](https://store.docker.com/editions/community/docker-ce-desktop-windows))
+- 설치 후 Windows 로그아웃 후 재실행 및 PowerShell에서 `docker version` 명령어 확인
+
+---
+
+## 13. Docker 이미지와 컨테이너 관리
+
+### 13.1 Docker 이미지 생성 및 Dockerfile
+#### Dockerfile 기본 구조 예제
+```Dockerfile
+# 베이스 이미지 선택
+FROM ubuntu:22.04
+
+# 메타데이터 추가
+LABEL maintainer="team@example.com"
+
+# 환경 변수 설정
+ENV APP_HOME=/app
+
+# 패키지 설치 등 명령 실행
+RUN apt-get update && apt-get install -y nginx
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 파일 복사
+COPY . .
+
+# 포트 노출
+EXPOSE 80
+
+# 실행 명령
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+#### 주요 Dockerfile 명령어
+- **FROM:** 기본 이미지 지정
+- **RUN:** 이미지 빌드 시 명령어 실행
+- **COPY/ADD:** 파일/디렉터리 복사
+- **ENV:** 환경 변수 설정
+- **EXPOSE:** 컨테이너 외부에 노출할 포트 지정
+- **CMD/ENTRYPOINT:** 컨테이너 시작 시 실행할 기본 명령어 설정
+
+### 13.2 이미지 빌드 및 관리
+#### 이미지 빌드 예제
+```bash
+# 기본 빌드
+docker build -t my-app:1.0 .
+
+# 캐시 무시하고 빌드
+docker build --no-cache -t my-app:1.0 .
+
+# 특정 Dockerfile 사용 (예: 프로덕션 환경)
+docker build -f Dockerfile.prod -t my-app:prod .
+```
+
+#### 이미지 관리 및 레지스트리 사용
+```bash
+# 이미지 목록 확인
+docker images
+
+# 태그 추가 및 변경
+docker tag my-app:1.0 registry.example.com/my-app:1.0
+
+# 이미지 삭제
+docker rmi my-app:1.0
+
+# 레지스트리에 이미지 푸시
+docker push registry.example.com/my-app:1.0
+```
+
+### 13.3 컨테이너 실행 및 관리
+#### 컨테이너 실행 기본 명령어
+```bash
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+```
+
+#### 주요 옵션
+- `-d, --detach`: 백그라운드 실행
+- `-p, --publish`: 호스트와 컨테이너간 포트 매핑 (예: `-p 80:80`)
+- `-v, --volume`: 볼륨 마운트
+- `--name`: 컨테이너 이름 지정
+
+#### 컨테이너 상태 확인, 중지, 삭제
+```bash
+# 실행 중인 컨테이너 목록 확인
+docker ps
+
+# 모든 컨테이너 확인 (정지된 컨테이너 포함)
+docker ps -a
+
+# 컨테이너 중지
+docker stop <CONTAINER_NAME>
+
+# 컨테이너 삭제
+docker rm <CONTAINER_NAME>
+```
+
+---
+
+## 14. Docker Desktop 및 Docker Compose
+
+### 14.1 Docker Desktop 사용 가이드
+- **개요:** Docker Desktop은 Mac, Windows, Linux에서 Docker 컨테이너를 관리할 수 있는 GUI 도구입니다.
+- **포함 기능:** Docker Engine, CLI, Compose, Kubernetes, 이미지 및 볼륨 관리, 컨테이너 실행/정지 등
+- **설치:** 각 운영체제별 요구사항에 맞춰 Docker 웹사이트에서 설치 파일 다운로드
+
+### 14.2 Docker Desktop 사용 방법
+- **GUI 방식:**
+  - 'Images' 탭에서 원하는 이미지를 선택하고 'Run' 버튼을 클릭
+  - 컨테이너 설정(포트, 볼륨, 환경 변수 등)을 지정 후 실행
+- **명령어 방식:**
+  ```bash
+  # 예시: nginx 컨테이너 실행
+  docker run -d -p 80:80 nginx
+  
+  # 이름 지정 및 볼륨 마운트 실행
+  docker run -d --name my-nginx -p 8080:80 -v ./html:/usr/share/nginx/html nginx
+  ```
+
+### 14.3 Docker Compose 사용하기
+#### Compose 파일 예제
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+      - "8080:80"
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+```
+
+#### 기본 Compose 명령어
+```bash
+# 모든 서비스 시작
+docker-compose up
+
+# 백그라운드 실행
+docker-compose up -d
+
+# 서비스 중지
+docker-compose down
+
+# 볼륨까지 모두 삭제 (주의)
+docker-compose down -v
+```
+
+---
+
+## 15. Docker 주요 명령어 및 best practices
+
+### 15.1 기본 Docker 명령어
+- **이미지 관련:**
+  ```bash
+  docker build -t myapp:1.0 .
+  docker images
+  docker pull nginx:latest
+  docker rmi myapp:1.0
+  ```
+- **컨테이너 관련:**
+  ```bash
+  docker run -d -p 8080:3000 --name mycontainer myapp:1.0
+  docker ps
+  docker ps -a
+  docker logs mycontainer
+  docker stop mycontainer
+  docker rm mycontainer
+  ```
+
+### 15.2 Best Practices
+- **Dockerfile 작성 시:**
+  - `.dockerignore` 파일 활용하여 불필요한 파일 제외
+  - 최소 베이스 이미지 선택 (ex. Alpine, slim)
+  - RUN 명령어를 체인으로 결합하여 레이어 수 최소화
+  - 캐시 활용 극대화 (자주 변경되는 파일은 나중에 복사)
+  - 가능하면 비루트 사용자로 실행
+  - 의존성 버전 명확하게 지정
+  - 개발/테스트/프로덕션별로 Dockerfile 분리
+- **보안:**
+  - 취약점 (예, CVE-2014-5282) 관련 업그레이드 및 패치 적용
+- **Compose 작성 시:**
+  - 환경 변수는 별도 파일로 관리
+  - 서비스 간 의존성 명확하게 지정 (depends_on 등)
 
 ---
